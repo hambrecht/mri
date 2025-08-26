@@ -108,7 +108,8 @@ leaflet() %>%
     weight = 3,
     opacity = 1,
     fillOpacity = 0,
-    group = "Area: Study Area"
+    group = "Area: Study Area",
+    popup = "1108km2"
   ) %>%
   addPolygons(
     data = surveyArea,
@@ -210,10 +211,14 @@ leaflet() %>%
   addRasterImage(
     fracSnow,
     colors = palSnow,
-    group = "Enviroment: Snow Cover",
+    group = "Enviroment: Snow Cover",-
     addRasterImage
   ) %>%
   
+  addScaleBar(
+    position = "bottomleft",
+    options = scaleBarOptions()
+  ) %>%
   addLegend("bottomleft", col = c("red", "green", "purple", "blue"), label = c("Survey area", "Provincal Park","Township", "Dog Lake"), title = "Area") %>%
   addLegend("bottomleft", col = c("yellow", "brown", "green", "red", "black"), label = c("Aerodrome: Two Island Lake", "Building", "Recreation point", "Tower", "Road"), title = "Infrastructure") %>%
   addLegend("bottomleft", col = c(palGreen, "orange", palSnow), label = c("Canopy Cover", "Moose Wintering Area", "Fraction Snow Cover"), title = "Enviroment") %>%
@@ -226,6 +231,6 @@ leaflet() %>%
 
 ## Private land map
 
-[link](https://www.lioapplications.lrc.gov.on.ca/CLUPA/index.html?viewer=CLUPA.CLUPA&locale=en-CA)
+[link](https://www.lioapplications.lrc.gov.on.ca/CLUPA/index.html?viewer=CLUPA.CLUPA&locale=en-CA){target="_blank"}
 
 
