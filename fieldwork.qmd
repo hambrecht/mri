@@ -211,7 +211,7 @@ leaflet() %>%
   addRasterImage(
     fracSnow,
     colors = palSnow,
-    group = "Enviroment: Snow Cover",-
+    group = "Enviroment: Snow Cover",
     addRasterImage
   ) %>%
   
@@ -219,6 +219,21 @@ leaflet() %>%
     position = "bottomleft",
     options = scaleBarOptions()
   ) %>%
+  addMeasure(
+  position = "bottomright",
+  primaryLengthUnit = "kilometers",
+  secondaryLengthUnit = "meters",
+  primaryAreaUnit = "hectares", 
+  secondaryAreaUnit = "sqmeters",
+  activeColor = "#ABE67E",
+  completedColor = "#C8F2BE",
+  popupOptions = list(className = "leaflet-measure-resultpopup", autoPanPadding = c(10,
+    10)),
+  captureZIndex = 10000,
+  localization = "en",
+  decPoint = ".",
+  thousandsSep = ","
+) %>%
   addLegend("bottomleft", col = c("red", "green", "purple", "blue"), label = c("Survey area", "Provincal Park","Township", "Dog Lake"), title = "Area") %>%
   addLegend("bottomleft", col = c("yellow", "brown", "green", "red", "black"), label = c("Aerodrome: Two Island Lake", "Building", "Recreation point", "Tower", "Road"), title = "Infrastructure") %>%
   addLegend("bottomleft", col = c(palGreen, "orange", palSnow), label = c("Canopy Cover", "Moose Wintering Area", "Fraction Snow Cover"), title = "Enviroment") %>%
