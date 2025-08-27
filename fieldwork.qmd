@@ -84,6 +84,10 @@ terra::ncell(LAI2021)      # total number of pixels
 
 ```
 ```{r leaflet-map, echo=FALSE}
+#| echo: false
+#| out-width: "100%"
+#| out-height: "60vh"
+#| column: page
 leaflet() %>%
 #Base layers
   addTiles() %>%
