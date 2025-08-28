@@ -21,13 +21,14 @@ library(terra)
 library(dplyr)
 library(RColorBrewer)
 privateLandImage <- rast("mapLayers/images/image003_WGS84.tif")
-fracSnow <- rast("mapLayers/LC08_CU_020002_20250311_20250328_02_VIEWABLE_SNOW_CLIPPED_SCALED_SMALLEST.TIF")
-fracSnowTiles <- "mapLayers/snowTiles/{z}/{x}/{y}.jpg"
+fracSnow <- rast("mapLayers/LC08_CU_020002_20250311_20250328_02_VIEWABLE_SNOW_MASKED_SCALED_SMALLEST.TIF")
 LAI2021 <- rast("mapLayers/LAI/custom_region_LAI_2021Winter_mean_scaled_uint16.tif")
 LAI2122 <- rast("mapLayers/LAI/custom_region_LAI_2122Winter_mean_scaled_uint16.tif")
 LAI2223 <- rast("mapLayers/LAI/custom_region_LAI_2223Winter_mean_scaled_uint16.tif")
 LAI2324 <- rast("mapLayers/LAI/custom_region_LAI_2324Winter_mean_scaled_uint16.tif")
 LAI2425 <- rast("mapLayers/LAI/custom_region_LAI_2425Winter_mean_scaled_uint16.tif")
+forestLoss <- rast("mapLayers/Hansen_GFC-2024-v1.12_lossyear_50N_090WMASKED.tif")
+forestGain <- rast("mapLayers/Hansen_GFC-2024-v1.12_gain_50N_090WMASKED.tif")
 studyArea <- st_read("mapLayers/studyAreaOntario.shp")
 studyArea <- st_transform(studyArea, crs = 4326) # WGS84
 surveyArea <- st_read("mapLayers/surveyArea.shp")
@@ -75,12 +76,19 @@ palLAI <- colorNumeric(
   domain = c(0,46500),
   na.color = "transparent"   # make NAs transparent
 )
+palLoss <- colorNumeric(
+  palette = brewer.pal(n = 9, name = "Reds"),
+  domain = range(values(forestLoss), na.rm = TRUE),
+  na.color = "transparent"
+)
+palGain <- colorNumeric(
+  palette = brewer.pal(n = 2, name = "Greens"),
+  domain = range(values(forestGain), na.rm = TRUE),
+  na.color = "transparent"
+)
 ```
 ```{r, include=FALSE}
-terra::inMemory(LAI2021)   # FALSE means values are not in RAM (pointer object)
-terra::sources(LAI2021)    # shows file(s) on disk the raster points to
-terra::ncell(LAI2021)      # total number of pixels
-4 * terra::ncell(LAI2021)  # approximate bytes of rendered image
+range(values(forestGain), na.rm = TRUE)
 
 ```
 ```{r leaflet-map, echo=FALSE}
@@ -147,6 +155,7 @@ leaflet() %>%
     opacity = 1,
     fillOpacity = 0.5,
     group = "Area:Provincal Park"
+    # attribution = "© Government of Ontario"
   ) %>%
   addPolygons(
     data = township,
@@ -155,6 +164,7 @@ leaflet() %>%
     opacity = 1,
     fillOpacity = 0.5,
     group = "Area:Township"
+    # attribution = "© Government of Ontario"
   ) %>%
   addPolygons(
     data = lake,
@@ -164,6 +174,7 @@ leaflet() %>%
     fillOpacity =0.8,
     popup = "Dog Lake",
     group = "Area:Lake"
+    # attribution = "OpenStreetMap"
   ) %>%
 # Infrastructure
   addPolygons(
@@ -183,6 +194,7 @@ leaflet() %>%
     color = "brown",
     popup = "Building",
     group = "Infrastructure: Buildings"
+    # attribution = "© Government of Ontario"
   ) %>%
   addCircles(
     data = recreationPoints,
@@ -192,6 +204,7 @@ leaflet() %>%
     color = "green",
     popup = "Recreation point",
     group = "Infrastructure: Recreation points"
+    # attribution = "© Government of Ontario"
   ) %>%
   addCircles(
     data = towers,
@@ -202,6 +215,7 @@ leaflet() %>%
     fillColor = "red",
     popup = "Tower",
     group = "Infrastructure: Towers"
+    # attribution = "© Government of Ontario"
   ) %>%
   addPolylines(
     data = roads,
@@ -209,6 +223,7 @@ leaflet() %>%
     weight = 2,
     opacity = 0.8,
     group = "Infrastructure: Roads"
+    # attribution = "OpenStreetMap"
   ) %>%
 # Enviroment
   addPolygons(
@@ -219,6 +234,7 @@ leaflet() %>%
     fillOpacity = 0.9,
     popup = ~paste0("Canopy Cover ", as.character(canopyCover$STRUCTUR_9),"%"),
     group = "Environment: SBFI 2020 Canopy Cover"
+    # attribution = "Wulder et al. 2024"
   ) %>%
   addPolygons(
     data = mooseWinterAreas,
@@ -228,44 +244,65 @@ leaflet() %>%
     fillOpacity = 0.4,
     popup = "Moose wintering area",
     group = "Environment: Moose wintering area"
+    # attribution = "© Government of Ontario"
   ) %>%
   addRasterImage(
     fracSnow,
     colors = palSnow,
     group = "Environment: Snow Cover",
-    maxBytes = 50 * 1024 * 1024
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "U.S. Geological Survey"
   ) %>%
   addRasterImage(
     LAI2021,
     colors = palLAI,
     group = "Environment: LAI Winter 2020-2021",
-    maxBytes = 50 * 1024 * 1024
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Fernandes et al. 2023"
   ) %>%
     addRasterImage(
     LAI2122,
     colors = palLAI,
     group = "Environment: LAI Winter 2021-2022",
-    maxBytes = 50 * 1024 * 1024
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Fernandes et al. 2023"
   ) %>%
     addRasterImage(
     LAI2223,
     colors = palLAI,
     group = "Environment: LAI Winter 2022-2023",
-    maxBytes = 50 * 1024 * 1024
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Fernandes et al. 2023"
   ) %>%
     addRasterImage(
     LAI2324,
     colors = palLAI,
     group = "Environment: LAI Winter 2023-2024",
-    maxBytes = 50 * 1024 * 1024
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Fernandes et al. 2023"
   ) %>%
     addRasterImage(
     LAI2425,
     colors = palLAI,
     group = "Environment: LAI Winter 2024-2025",
-    maxBytes = 50 * 1024 * 1024
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Fernandes et al. 2023"
   ) %>%
-  
+   addRasterImage(
+    forestLoss,
+    colors = palLoss,
+    group = "Environment: Tree Cover Loss 2001-2024",
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Hansen/UMD/Google/USGS/NASA"
+  ) %>%
+   addRasterImage(
+    forestGain,
+    colors = palGain,
+    group = "Environment: Tree Cover Gain 2001-2024",
+    maxBytes = 50 * 1024 * 1024,
+    attribution = "Hansen/UMD/Google/USGS/NASA"
+  ) %>%
+
   addScaleBar(
     position = "bottomleft",
     options = scaleBarOptions()
@@ -289,14 +326,16 @@ leaflet() %>%
   addLegend("bottomleft", col = c("yellow", "brown", "green", "red", "black"), label = c("Aerodrome: Two Island Lake", "Building", "Recreation point", "Tower", "Road"), title = "Infrastructure") %>%
   # addLegend("bottomleft", col = c(palGreen, palLAI, palSnow, "orange"), col = c(palGreen, palLAI, palSnow, "orange"), label = c("SBFI 2020 Canopy Cover", "LAI Winter", "Fraction Snow Cover", "Moose Wintering Area"), title = "Environment") %>%
   addLayersControl(
-    overlayGroups = c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Survey Area", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environment: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025","Environment: Snow Cover", "Environment: Moose wintering area"),
+    overlayGroups = c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Survey Area", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environmenrent: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025", "Environment: Tree Cover Gain 2001-2024", "Environment: Tree Cover Loss 2001-2024", "Environment: Snow Cover", "Environment: Moose wintering area"),
     options = layersControlOptions(collapsed = FALSE)
   ) %>%
-  hideGroup(c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover","Environment: Moose wintering area", "Environment: Snow Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environment: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025"))
+  hideGroup(c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover","Environment: Moose wintering area", "Environment: Snow Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environment: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025", "Environment: Tree Cover Gain", "Environment: Tree Cover Loss 2001-2024", "Environment: Snow Cover 2001-2024"))
 ```
 
 ## Private land map
 
 [link](https://www.lioapplications.lrc.gov.on.ca/CLUPA/index.html?viewer=CLUPA.CLUPA&locale=en-CA){target="_blank"}
+
+
 
 
