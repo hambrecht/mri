@@ -139,15 +139,15 @@ leaflet() %>%
     fillOpacity = 0,
     group = "Area: Study Area"    
   ) %>%
-  # addPolygons(
-  #   data = surveyArea,
-  #   color = "red",
-  #   weight = 1,
-  #   opacity = 1,
-  #   fillOpacity = 0.5,
-  #   group = "Area:Survey Area",
-  #   popup = "1108km2"
-  # ) %>%
+  addPolygons(
+    data = surveyArea,
+    color = "red",
+    weight = 1,
+    opacity = 1,
+    fillOpacity = 0.5,
+    group = "Area:Survey Area",
+    popup = "1108km2"
+  ) %>%
   addPolygons(
     data = provincalPark,
     color = "green",
@@ -326,7 +326,7 @@ leaflet() %>%
   addLegend("bottomleft", col = c("yellow", "brown", "green", "red", "black"), label = c("Aerodrome: Two Island Lake", "Building", "Recreation point", "Tower", "Road"), title = "Infrastructure") %>%
   # addLegend("bottomleft", col = c(palGreen, palLAI, palSnow, "orange"), col = c(palGreen, palLAI, palSnow, "orange"), label = c("SBFI 2020 Canopy Cover", "LAI Winter", "Fraction Snow Cover", "Moose Wintering Area"), title = "Environment") %>%
   addLayersControl(
-    overlayGroups = c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environment: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025", "Environment: Tree Cover Gain 2001-2024", "Environment: Tree Cover Loss 2001-2024", "Environment: Snow Cover", "Environment: Moose wintering area"),
+    overlayGroups = c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Survey Area", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environment: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025", "Environment: Tree Cover Gain 2001-2024", "Environment: Tree Cover Loss 2001-2024", "Environment: Snow Cover", "Environment: Moose wintering area"),
     options = layersControlOptions(collapsed = FALSE)
   ) %>%
   hideGroup(c("Base layer: OpenTopo", "Base layer: Mapzen Global Terrain", "Base layer: Relief map of DTM", "Base layer: Aerial Imagery", "Base layer: Private Land", "Area:Provincal Park", "Area:Township", "Area:Lake", "Aerodrome", "Infrastructure: Buildings", "Infrastructure: Recreation points", "Infrastructure: Towers", "Infrastructure: Roads", "Environment: SBFI 2020 Canopy Cover","Environment: Moose wintering area", "Environment: Snow Cover", "Environment: LAI Winter 2020-2021", "Environment: LAI Winter 2021-2022", "Environment: LAI Winter 2022-2023", "Environment: LAI Winter 2023-2024", "Environment: LAI Winter 2024-2025", "Environment: Tree Cover Gain 2001-2024", "Environment: Tree Cover Loss 2001-2024", "Environment: Snow Cover 2001-2024"))
