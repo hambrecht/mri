@@ -141,12 +141,12 @@ leaflet() %>%
   ) %>%
   addPolygons(
     data = surveyArea,
-    color = "red",
+    color = c("red", "yellow"),
     weight = 1,
     opacity = 1,
     fillOpacity = 0.5,
     group = "Area:Survey Area",
-    popup = "1108km2"
+    popup = c("Primary: 400km2", "Secondary: 350km2")
   ) %>%
   addPolygons(
     data = provincalPark,
