@@ -7,22 +7,25 @@ execute:
   warning: false
   message: false
 ---
-| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Field Work](fieldwork.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
+
+| [Home](index.html) \| [Simulations](sim.html) \| [Deep Learning](dl.html) \| [Field Work](fieldwork.html) \| [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} \| [fRI Research](https://friresearch.ca/){target="_blank"} \| [Contact](mailto:137965368+hambrecht@users.noreply.github.com) \|
+
 # Thunderbay
-The aim of this field campaign is to collect thermal images of moose using a fixed-wing drone under operationally realistic conditions. The data will be analyzed to establish the detection function and evaluate how different environmental variables influence detection probability. In addition, the collected images will be used to train a deep-learning model for moose detection and identification.
-The study area, located north of Thunder Bay, Ontario, was chosen because the Ontario Ministry of Natural Resources (MNR) has over 100 GPS-collared moose, providing reliable ground-truth data. The western portion of the study area includes active logging sites with various treatment options, as well as protected areas such as a provincial park and a conservation reserve. This landscape offers a wide range of canopy and snow cover conditions. The terrain features only minor elevation changes; however, Dog Lake, a prominent feature at the centre of the study area, is frozen during winter. Between the lake and the more sheltered forest stands, we expect significant temperature variation. Logging roads provide convenient access to most parts of the area.
-The combination of GPS-collared moose, diverse environmental conditions, and good accessibility makes the study area particularly well suited for this project. The data collected will be used to assess how environmental factors—especially canopy cover, but also snow cover and temperature—affect the probability of detecting moose in drone-based thermal imagery. Importantly, the precise location data from GPS collars provided by MNR make this dataset unique and enable a more robust assessment of detection probability.
+
+The aim of this field campaign is to collect thermal images of moose using a fixed-wing drone under operationally realistic conditions. The data will be analyzed to establish the detection function and evaluate how different environmental variables influence detection probability. In addition, the collected images will be used to train a deep-learning model for moose detection and identification. The study area, located north of Thunder Bay, Ontario, was chosen because the Ontario Ministry of Natural Resources (MNR) has over 100 GPS-collared moose, providing reliable ground-truth data. The western portion of the study area includes active logging sites with various treatment options, as well as protected areas such as a provincial park and a conservation reserve. This landscape offers a wide range of canopy and snow cover conditions. The terrain features only minor elevation changes; however, Dog Lake, a prominent feature at the centre of the study area, is frozen during winter. Between the lake and the more sheltered forest stands, we expect significant temperature variation. Logging roads provide convenient access to most parts of the area. The combination of GPS-collared moose, diverse environmental conditions, and good accessibility makes the study area particularly well suited for this project. The data collected will be used to assess how environmental factors—especially canopy cover, but also snow cover and temperature—affect the probability of detecting moose in drone-based thermal imagery. Importantly, the precise location data from GPS collars provided by MNR make this dataset unique and enable a more robust assessment of detection probability.
 
 ## Flight plan specifications
+
 Flight Details:
-- Transect lines oriented North–South, spaced 600 m apart.
+
+- Transect lines oriented North–South, spaced 600 m apart
 - Flight altitude: 120 m
 - Speed: 65 km/h
 - Priorities thermal photo for deep-learning
   - Optimized gimbal movements to reduce motion blur in images
   - No on-screen display (OSD) in images
 - Only zoom in far enough to confirm species with RGB camera
-- 
+
 A two-week window (10 working days) is expected to provide sufficient opportunity for data collection. Two members from the University of British Columbia (UBC) will be present in the field to coordinate operations.
 
 ## My Interactive Map
@@ -102,10 +105,12 @@ palGain <- colorNumeric(
   na.color = "transparent"
 )
 ```
+
 ```{r, include=FALSE}
 range(values(forestGain), na.rm = TRUE)
 
 ```
+
 ```{r leaflet-map, echo=FALSE}
 #| echo: false
 #| out-width: "100%"
@@ -350,7 +355,3 @@ leaflet() %>%
 ## Private land map
 
 [link](https://www.lioapplications.lrc.gov.on.ca/CLUPA/index.html?viewer=CLUPA.CLUPA&locale=en-CA){target="_blank"}
-
-
-
-
