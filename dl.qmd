@@ -11,3 +11,4 @@ Unmanned Aerial Vehicles (UAVs) offer a promising alternative to conventional su
 
 | ![Visible light (RGB) image of a conifer forest](figures\DJI_20250122123651_0030_W.jpg) | ![Thermal image showing two animals](figures\DJI_20250122123651_0030_T.JPG) | ![IR image zoomed in on the thermal signatures](figures\thermalHorses.png) |
 |:--:|:--:|:--:|
+| Visible light (RGB) image of a conifer forest | Thermal image showing two animals | IR image zoomed in on the thermal signatures |
