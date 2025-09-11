@@ -16,11 +16,10 @@ Estimating population sizes is crucial for biodiversity management, providing a 
 ### Results
 ![Figure 5. Mean estimated density for each simulation by WMU.](figures\Fig 5.jpg)
 
-
 ![Figure 6. Summary statistics of the estimated density for each simulation, averaged across all WMUs. The summary statistics include the relative mean density (A), bias (B), relative RMSE (C), proportion of times the 95% confidence interval contained the true density (D), mean standard error (E), coefficient of variation (F), mean encounter rate (G), and mean standard error of the encounter rate (H).
 ](figures\Fig 6.jpg)
 
-
 ![Figure 7. Comparison of mean estimated density across different survey designs with varying input density levels (1x, 0.75x, 0.5x, 0.25x). The input densities are indicated by the dashed lines.](figures\Fig 7.jpg)
 
-
+## When is a quadcopter the right tool for wildlife surveys? Assessing quadcopter applications to monitor  populations.
+TBA 
