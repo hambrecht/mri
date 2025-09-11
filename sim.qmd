@@ -4,4 +4,23 @@ format: html
 page-layout: full
 ---
 | [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Field Work](fieldwork.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
-## Simulations
+# Simulations
+## Optimizing wildlife survey design: Simulating drone and helicopter surveys for moose detection and population estimation
+**Authors**: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse
+
+**Keywords**: Distance sampling, thermal, UAV, UAS, density, population estimate, detection function, survey design
+
+### Abstract
+Estimating population sizes is crucial for biodiversity management, providing a quantitative framework for conservation and management strategies. While conventional helicopter surveys offer good coverage, their expense and safety risks for observers justify exploring alternatives. This simulation study examined the influence of survey design, camera configuration, and moose density on the accuracy and efficiency of drone surveys (fixed-wing and quadcopter) compared to helicopter surveys for estimating moose populations using distance sampling. Simulations used existing moose survey data from five Wildlife Management Units (WMUs) in Alberta, Canada (2,132 to 12,034 km²), with varying densities. Systematic and zigzag transects for fixed-wing drones and systematic transects for quadcopters were compared to the helicopter's segmented grid design. Key results indicated that conventional helicopter surveys provided the best coverage and robust estimates, particularly in low-density areas, but tended to underestimate density. Fixed-wing drones emerged as a viable alternative, delivering the most accurate density estimates across scenarios, including at low moose densities. The quadcopter with a NADIR camera configuration significantly overestimated moose density, primarily due to the assumption of uniform detection within its narrow field of view. The limited coverage of quadcopter surveys (approximately 10% on average) also negatively impacted overall accuracy and efficiency, especially in low-density areas. However, a quadcopter with a gimbal provided density estimates more comparable to fixed-wing drones, although coverage limitations remained. Zigzag designs for fixed-wing drones achieved a higher proportion of on-transect distance (up to 93.9%) compared to systematic designs and quadcopter surveys (78.2% on average), suggesting greater efficiency. The study recommends using a two-camera or gimbal configuration for drone surveys due to the narrow coverage of the NADIR configuration. These findings suggest that while helicopters remain robust, fixed-wing drones show significant potential as an accurate alternative for moose surveys, whereas quadcopters have limitations due to coverage. However, environmental factors such as canopy cover, snow, and temperature may affect real-world survey performance.
+
+### Results
+![Figure 5. Mean estimated density for each simulation by WMU.](figures\Fig 5.jpg)
+
+
+![Figure 6. Summary statistics of the estimated density for each simulation, averaged across all WMUs. The summary statistics include the relative mean density (A), bias (B), relative RMSE (C), proportion of times the 95% confidence interval contained the true density (D), mean standard error (E), coefficient of variation (F), mean encounter rate (G), and mean standard error of the encounter rate (H).
+](figures\Fig 6.jpg)
+
+
+![Figure 7. Comparison of mean estimated density across different survey designs with varying input density levels (1x, 0.75x, 0.5x, 0.25x). The input densities are indicated by the dashed lines.](figures\Fig 7.jpg)
+
+
