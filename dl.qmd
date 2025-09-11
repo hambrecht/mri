@@ -4,6 +4,10 @@ format: html
 page-layout: full
 ---
 | [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Field Work](fieldwork.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
-## Deep learning
-![](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjBnN29wODVrNHl4d2FxOWs2enhkdnV5ZXcyNHo3aTNwMGlqeW1haCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PUYgk3wpNk0WA/giphy.gif)
+# Deep learning
+**Author**: Hiroto Goto, Nicholas C. Coops
 
+Unmanned Aerial Vehicles (UAVs) offer a promising alternative to conventional survey methods and can be equipped with thermal infrared sensors to mitigate visual occlusion and enable nighttime imaging. However, the large data volume generated from drone flights presents a significant bottleneck as manual review can be time-consuming, inefficient, and error prone. Recent advancements in deep learning have revolutionized the ability for automated wildlife detection from drone imagery using convolutional neural networks (CNNs).  This study develops and validates a deep learning pipeline to automate the detection and classification of terrestrial mammals, including moose, across Canada’s forested boreal landscapes. Thermal footage was collected using a manually piloted fixed-wing UAV, and a multi-stage deep learning framework was implemented to identify candidate hotspots followed by species confirmation. The results demonstrate the feasibility of combining UAV thermal surveys with deep learning for scalable multi-species monitoring under challenging environmental conditions.
+
+| ![Visible light (RGB) image of a conifer forest](figures\DJI_20250122123651_0030_W.jpg) | ![Thermal image showing two animals](figures\DJI_20250122123651_0030_T.JPG) | ![IR image zoomed in on the thermal signatures](figures\thermalHorses.png) |
+|:--:|:--:|:--:|
