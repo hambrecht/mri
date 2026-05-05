@@ -1,10 +1,10 @@
 ---
-title: "Simulations"
+title: "Moose Research Initiative - Theme 4"
 format: html
 page-layout: full
 ---
 
-| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Field Work](fieldwork.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
+| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Detection function](df.html) |
 
 
 # Project Overview
@@ -25,3 +25,12 @@ Theme 4 aims to assess the feasibility and potential of unmanned aerial systems 
 | Gord Stenhouse | ![](https://friresearch.ca/data/Gord.jpg) |
 | Leonard Hambrecht | ![](https://irss.sites.olt.ubc.ca/files/2025/05/Leonard-Hambrecht-05-25-Website-1-scaled.jpg) |
 | Hiroto Goto | ![](https://irss.sites.olt.ubc.ca/files/2025/05/Hiroto-Goto-05-25-cropped.jpg) |
+
+## Contact
+| Name | Email |
+|:--:|:--:|
+| Leonard Hambrecht | [hambrecht@users.noreply.github.com](mailto:137965368+hambrecht@users.noreply.github.com) |
+
+## Website
+[IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"}
+[fRI Research](https://friresearch.ca/){target="_blank"}
