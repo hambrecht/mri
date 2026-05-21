@@ -1,0 +1,75 @@
+---
+title: "When Is a Quadcopter the Right Tool for Wildlife Surveys?"
+format: html
+page-layout: full
+---
+
+| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Detection function](df.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
+
+# When Is a Quadcopter the Right Tool for Wildlife Surveys? Assessing Quadcopter Applications to Monitor Wildlife Populations
+
+**Authors**: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse, Philip DeWitt, Jason Airst
+
+**Keywords**: Distance sampling, thermal, UAV, UAS, density, population estimate, detection function, survey design
+
+---
+
+## Overview
+
+Quadcopters — compact, off-the-shelf multirotor drones — have become widely used for wildlife monitoring. They are inexpensive, easy to deploy in rugged terrain, and capable of carrying thermal cameras that detect animals day or night. But for all their appeal, a critical question has remained unanswered: *at what animal density do they actually produce reliable population estimates, and which flight design gets you there most efficiently?*
+
+This study addresses that gap through a systematic simulation study, evaluating five quadcopter survey designs across ten wildlife density levels in a controlled 10 × 10 km landscape. The goal is to give wildlife managers practical, evidence-based guidelines for deciding when — and how — to use a quadcopter for population surveys.
+
+---
+
+## Study Design
+
+We built an artificial density surface model representing a 10 × 10 km study area with realistic spatial heterogeneity — clustered hotspots and low-use zones — similar to how large mammals actually distribute themselves across a landscape. We simulated wildlife populations ranging from 50 to 900 individuals per 1,000 km², covering the density ranges typical of deer, moose, elephants, and large carnivores.
+
+The area was divided into 2 × 2 km sample blocks, representing one day of surveying under extended line-of-sight conditions. We tested configurations of 4, 9, 16, and 25 blocks and compared five flight designs:
+
+| Design | Description |
+|--------|-------------|
+| 65% overlap | Standard orthomosaic mapping overlap |
+| 10% overlap | Minimum supported by flight-planning software |
+| 0% overlap | Non-overlapping strip transects |
+| 200 m spacing | Fixed wide spacing, manually planned |
+| Gimbal (line transect) | Camera pans left-right; half-normal detection function, 155 m half-width |
+
+Each of the 200 unique simulation scenarios was replicated 999 times. Performance was evaluated using bias, coefficient of variation (CV ≤ 0.15 as the precision threshold), and root mean square deviation (RMSE).
+
+---
+
+## Key Findings
+
+**The 65% overlap design is the most precise — but comes at a steep cost.** This design reliably met the CV threshold across all densities and block configurations, but required roughly eleven times more survey effort than the gimbal design. It also introduced a real risk of double-counting animals that moved between passes, a problem that must be carefully managed in the field.
+
+**The 10% and 0% overlap designs hit a sweet spot for moderate-density populations.** Above 400 individuals per 1,000 km², these designs achieved acceptable precision when 9–16 sample blocks were surveyed, with substantially less effort than the 65% design. They are the recommended choice for species in that density range.
+
+**The 200 m spacing design underperforms across the board.** It consistently overestimated population size, failed to meet the precision threshold at any density, and produced insufficient detections at low densities. It is not recommended for population estimation.
+
+**The gimbal line-transect design requires high effort to work.** Despite being the most effort-efficient per km flown, the gimbal design needed all 25 sample blocks to meet the CV threshold, and only did so at the highest tested density. For quadcopters operating within their typical 2 × 2 km range, the strip transect designs are more practical.
+
+**Survey effort and precision are tightly linked.** Designs requiring 300–500 km of on-transect effort produced reliable estimates above ~800 individuals per 1,000 km²; efforts above 800 km extended reliability down to ~500 individuals per 1,000 km². At low densities, high overlap may be necessary — but introduces double-counting risks that require careful image review.
+
+---
+
+## Practical Recommendations
+
+**For densities above 400 individuals per 1,000 km²:** Use 0% or 10% overlap strip transects with 9–16 sample blocks. This balances accuracy and effort without the double-counting risks of high overlap.
+
+**For densities below 400 individuals per 1,000 km²:** Use 65% overlap with a census approach and carefully review images to remove double-counted individuals. Alternatively, reconsider whether a quadcopter is the right platform — low-density, large-area surveys may be better served by a fixed-wing drone.
+
+**For areas larger than 10 × 10 km:** Fixed-wing drones combined with line-transect distance sampling are a more efficient and rigorous option. Quadcopters are well-matched to small, accessible study areas where rugged terrain precludes fixed-wing operations.
+
+**Avoid the 200 m spacing design** for population estimation — its systematic overestimation makes it unsuitable regardless of effort.
+
+---
+
+## Why This Matters
+
+As drone technology becomes more accessible, the temptation to use a quadcopter for everything grows. This study provides a clear-eyed assessment of where quadcopters genuinely excel (moderate-to-high density, small study areas, rugged terrain) and where their limitations become a liability (large areas, low-density species, extensive coverage requirements). By matching the tool to the task, wildlife managers can get rigorous, cost-effective population estimates — and avoid the pitfall of precise-sounding numbers that are quietly biased.
+
+---
+
+*Hambrecht, L., Coops, N. C., Stenhouse, G., DeWitt, P., & Airst, J. When is a quadcopter the right tool for wildlife surveys? Assessing quadcopter applications to monitor populations. Manuscript in preparation.*
