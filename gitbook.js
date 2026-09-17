@@ -63,6 +63,22 @@ document.addEventListener("DOMContentLoaded", () => {
     return (clone.textContent || "Section").trim();
   };
 
+  const slugCounts = new Map();
+  const ensureHeadingId = (heading) => {
+    if (heading.id) return heading.id;
+    const base = getHeadingLabel(heading)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "section";
+    const count = slugCounts.get(base) || 0;
+    slugCounts.set(base, count + 1);
+    const slug = count === 0 ? base : `${base}-${count + 1}`;
+    heading.id = slug;
+    if (!heading.dataset.anchorId) heading.dataset.anchorId = slug;
+    if (!heading.classList.contains("anchored")) heading.classList.add("anchored");
+    return slug;
+  };
+
   const makeLink = ({ href, label, description, className, external }) => {
     const link = document.createElement("a");
     link.href = href;
@@ -120,12 +136,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   sidebar.appendChild(pagesSection.wrapper);
 
-  const outlineHeadings = Array.from(main.querySelectorAll("h2.anchored, h3.anchored")).filter((heading) => heading.id);
+  const outlineHeadings = Array.from(main.querySelectorAll("h2, h3")).filter((heading) => getHeadingLabel(heading));
   if (outlineHeadings.length > 0) {
     const outlineSection = makeSection("On this page", "gitbook-outline");
     outlineSection.nav.setAttribute("aria-label", "Page outline");
     for (const heading of outlineHeadings) {
-      outlineSection.nav.appendChild(makeLink({ href: `#${heading.id}`, label: getHeadingLabel(heading) }));
+      const headingId = ensureHeadingId(heading);
+      outlineSection.nav.appendChild(makeLink({ href: `#${headingId}`, label: getHeadingLabel(heading) }));
     }
     sidebar.appendChild(outlineSection.wrapper);
   }
