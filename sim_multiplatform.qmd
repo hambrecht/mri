@@ -1,10 +1,11 @@
 ---
 title: "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose"
-format: html
+format:
+  html:
+    css: gitbook.css
+    include-after-body: gitbook-after-body.html
 page-layout: full
 ---
-
-| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Detection function](df.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
 
 # Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose Detection and Population Estimation
 
@@ -37,6 +38,7 @@ We compared three aerial platforms across multiple survey designs:
 - **Quadcopter**: systematic subplot design with two camera options — nadir (straight down) and gimbal (angled sweep)
 
 Camera configuration was a key variable. We modeled three detection functions:
+
 - **Nadir** (straight-down camera): narrow 40 m strip half-width, uniform detection assumed
 - **Two-camera / Gimbal**: wider effective detection area, half-normal detection function — comparable to how biologists visually scan from a helicopter
 
@@ -63,7 +65,7 @@ Simulations varied moose density at 100%, 75%, 50%, and 25% of observed levels t
 1. **Use fixed-wing drones** as the primary alternative to helicopters for large-area, low-density moose surveys. They deliver accurate estimates with comparable efficiency.
 2. **Avoid nadir-only quadcopter configurations** for population estimation — the narrow detection strip leads to severe overestimation.
 3. **Equip quadcopters with a gimbal or dual-camera setup** if they must be used, substantially improving accuracy while acknowledging remaining coverage constraints.
-4. **Apply zigzag transect designs** for fixed-wing platforms to maximise on-transect efficiency.
+4. **Apply zigzag transect designs** for fixed-wing platforms to maximize on-transect efficiency.
 
 ---
 
