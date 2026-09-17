@@ -1,2 +1,2 @@
-# [drones4wildlifesurveys](https://hambrecht.github.io/drones4wildlifesurveys/)
+# [Moose Reseaerch Iniative](https://hambrecht.github.io/mri/)
 FRiaa funded project
