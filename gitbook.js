@@ -31,10 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!main || !shell) return;
 
   const path = window.location.pathname.split("/").pop() || "index.html";
-  const currentIndex = Math.max(0, pages.findIndex((page) => page.file === path));
-  const currentPage = pages[currentIndex];
-  const prevPage = pages[currentIndex - 1] || null;
-  const nextPage = pages[currentIndex + 1] || null;
+  const currentIndex = pages.findIndex((page) => page.file === path);
+  const currentPage = currentIndex >= 0 ? pages[currentIndex] : null;
+  const prevPage = currentIndex > 0 ? pages[currentIndex - 1] : null;
+  const nextPage = currentIndex >= 0 && currentIndex < pages.length - 1 ? pages[currentIndex + 1] : null;
 
   document.body.classList.add("gitbook-ready");
 
@@ -45,52 +45,106 @@ document.addEventListener("DOMContentLoaded", () => {
   if (titleNode && currentPage) titleNode.textContent = currentPage.title;
   if (currentPage) document.title = `${currentPage.title} | Moose Research Initiative`;
 
+  const makeLink = ({ href, label, description, className, external }) => {
+    const link = document.createElement("a");
+    link.href = href;
+    if (className) link.className = className;
+    if (external) {
+      link.target = "_blank";
+      link.rel = "noreferrer";
+    }
+    link.append(label);
+    if (description) {
+      const small = document.createElement("small");
+      small.textContent = description;
+      link.appendChild(small);
+    }
+    return link;
+  };
+
+  const makeSection = (label, navClass) => {
+    const wrapper = document.createElement("div");
+    const heading = document.createElement("div");
+    heading.className = "gitbook-section-label";
+    heading.textContent = label;
+    const nav = document.createElement("nav");
+    nav.className = navClass;
+    wrapper.appendChild(heading);
+    wrapper.appendChild(nav);
+    return { wrapper, nav };
+  };
+
   const sidebar = document.createElement("aside");
   sidebar.className = "gitbook-sidebar";
 
-  const navMarkup = pages.map((page) => {
-    const active = page.file === currentPage.file ? "active" : "";
-    return `<a class="${active}" href="${page.href}">${page.title}<small>${page.description}</small></a>`;
-  }).join("");
+  const brand = document.createElement("div");
+  brand.className = "gitbook-brand";
+  const eyebrow = document.createElement("span");
+  eyebrow.className = "gitbook-eyebrow";
+  eyebrow.textContent = "Research Pages";
+  const brandTitle = makeLink({ href: "index.html", label: "Moose Research Initiative", className: "gitbook-brand-title" });
+  const brandCopy = document.createElement("p");
+  brandCopy.className = "gitbook-brand-copy";
+  brandCopy.textContent = "GitBook-style navigation for Theme 4 project pages.";
+  brand.append(eyebrow, brandTitle, brandCopy);
+  sidebar.appendChild(brand);
 
-  const outlineLinks = Array.from(main.querySelectorAll("h2.anchored, h3.anchored"))
-    .map((heading) => {
-      if (!heading.id) return "";
-      return `<a href="#${heading.id}">${heading.textContent}</a>`;
-    })
-    .filter(Boolean)
-    .join("");
+  const pagesSection = makeSection("Pages", "gitbook-nav");
+  pagesSection.nav.setAttribute("aria-label", "Primary page navigation");
+  for (const page of pages) {
+    const link = makeLink({
+      href: page.href,
+      label: page.title,
+      description: page.description,
+      className: currentPage && page.file === currentPage.file ? "active" : ""
+    });
+    pagesSection.nav.appendChild(link);
+  }
+  sidebar.appendChild(pagesSection.wrapper);
 
-  const metaLinks = externalLinks.map((link) => {
-    const attrs = link.external ? ' target="_blank" rel="noreferrer"' : "";
-    return `<a href="${link.href}"${attrs}>${link.label}</a>`;
-  }).join("");
+  const outlineHeadings = Array.from(main.querySelectorAll("h2.anchored, h3.anchored")).filter((heading) => heading.id);
+  if (outlineHeadings.length > 0) {
+    const outlineSection = makeSection("On this page", "gitbook-outline");
+    outlineSection.nav.setAttribute("aria-label", "Page outline");
+    for (const heading of outlineHeadings) {
+      outlineSection.nav.appendChild(makeLink({ href: `#${heading.id}`, label: heading.textContent || "Section" }));
+    }
+    sidebar.appendChild(outlineSection.wrapper);
+  }
 
-  sidebar.innerHTML = `
-    <div class="gitbook-brand">
-      <span class="gitbook-eyebrow">Research Pages</span>
-      <a class="gitbook-brand-title" href="index.html">Moose Research Initiative</a>
-      <p class="gitbook-brand-copy">GitBook-style navigation for Theme 4 project pages.</p>
-    </div>
-    <div>
-      <div class="gitbook-section-label">Pages</div>
-      <nav class="gitbook-nav" aria-label="Primary page navigation">${navMarkup}</nav>
-    </div>
-    ${outlineLinks ? `<div><div class="gitbook-section-label">On this page</div><nav class="gitbook-outline" aria-label="Page outline">${outlineLinks}</nav></div>` : ""}
-    <div>
-      <div class="gitbook-section-label">Links</div>
-      <nav class="gitbook-meta-links" aria-label="External links">${metaLinks}</nav>
-    </div>
-  `;
+  const linksSection = makeSection("Links", "gitbook-meta-links");
+  linksSection.nav.setAttribute("aria-label", "External links");
+  for (const link of externalLinks) {
+    linksSection.nav.appendChild(makeLink(link));
+  }
+  sidebar.appendChild(linksSection.wrapper);
 
   shell.insertBefore(sidebar, shell.firstChild);
+
+  if (!currentPage) return;
 
   const footer = document.createElement("nav");
   footer.className = "gitbook-page-footer";
   footer.setAttribute("aria-label", "Page navigation");
-  footer.innerHTML = `
-    ${prevPage ? `<a class="gitbook-page-link prev" href="${prevPage.href}"><small>Previous</small>${prevPage.title}</a>` : "<span></span>"}
-    ${nextPage ? `<a class="gitbook-page-link next" href="${nextPage.href}"><small>Next</small>${nextPage.title}</a>` : "<span></span>"}
-  `;
+
+  const prevSlot = prevPage
+    ? makeLink({ href: prevPage.href, label: prevPage.title, className: "gitbook-page-link prev" })
+    : document.createElement("span");
+  const nextSlot = nextPage
+    ? makeLink({ href: nextPage.href, label: nextPage.title, className: "gitbook-page-link next" })
+    : document.createElement("span");
+
+  if (prevPage) {
+    const label = document.createElement("small");
+    label.textContent = "Previous";
+    prevSlot.prepend(label);
+  }
+  if (nextPage) {
+    const label = document.createElement("small");
+    label.textContent = "Next";
+    nextSlot.prepend(label);
+  }
+
+  footer.append(prevSlot, nextSlot);
   main.appendChild(footer);
 });
