@@ -38,6 +38,7 @@ We compared three aerial platforms across multiple survey designs:
 - **Quadcopter**: systematic subplot design with two camera options — nadir (straight down) and gimbal (angled sweep)
 
 Camera configuration was a key variable. We modeled three detection functions:
+
 - **Nadir** (straight-down camera): narrow 40 m strip half-width, uniform detection assumed
 - **Two-camera / Gimbal**: wider effective detection area, half-normal detection function — comparable to how biologists visually scan from a helicopter
 

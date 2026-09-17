@@ -10,7 +10,19 @@ document.addEventListener("DOMContentLoaded", () => {
       href: "sim.html",
       file: "sim.html",
       title: "Simulations",
-      description: "Survey design findings for fixed-wing and quadcopter workflows."
+      description: "Summary of the simulation research stream."
+    },
+    {
+      href: "sim_multiplatform.html",
+      file: "sim_multiplatform.html",
+      title: "Multi-platform Simulations",
+      description: "Fixed-wing, quadcopter, and helicopter survey comparisons."
+    },
+    {
+      href: "sim_quadcopter.html",
+      file: "sim_quadcopter.html",
+      title: "Quadcopter Simulations",
+      description: "Density thresholds and design trade-offs for quadcopters."
     },
     {
       href: "dl.html",
@@ -28,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const main = document.getElementById("quarto-document-content");
   const shell = document.getElementById("quarto-content");
-  if (!main || !shell) return;
+  if (!main || !shell || document.body.classList.contains("gitbook-ready")) return;
 
   const path = window.location.pathname.split("/").pop() || "index.html";
   const currentIndex = pages.findIndex((page) => page.file === path);
@@ -44,6 +56,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const titleNode = document.querySelector("#title-block-header .title");
   if (titleNode && currentPage) titleNode.textContent = currentPage.title;
   if (currentPage) document.title = `${currentPage.title} | Moose Research Initiative`;
+
+  const getHeadingLabel = (heading) => {
+    const clone = heading.cloneNode(true);
+    clone.querySelectorAll(".anchorjs-link").forEach((node) => node.remove());
+    return (clone.textContent || "Section").trim();
+  };
 
   const makeLink = ({ href, label, description, className, external }) => {
     const link = document.createElement("a");
@@ -107,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const outlineSection = makeSection("On this page", "gitbook-outline");
     outlineSection.nav.setAttribute("aria-label", "Page outline");
     for (const heading of outlineHeadings) {
-      outlineSection.nav.appendChild(makeLink({ href: `#${heading.id}`, label: heading.textContent || "Section" }));
+      outlineSection.nav.appendChild(makeLink({ href: `#${heading.id}`, label: getHeadingLabel(heading) }));
     }
     sidebar.appendChild(outlineSection.wrapper);
   }
