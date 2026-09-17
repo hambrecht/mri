@@ -2,31 +2,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const pages = [
     {
       href: "index.html",
-      file: "index.html",
       title: "Moose Research Initiative - Theme 4",
       description: "Project overview, team, and research context."
     },
     {
       href: "sim.html",
-      file: "sim.html",
       title: "Simulations",
       description: "Summary of the simulation research stream."
     },
     {
       href: "sim_multiplatform.html",
-      file: "sim_multiplatform.html",
       title: "Multi-platform Simulations",
       description: "Fixed-wing, quadcopter, and helicopter survey comparisons."
     },
     {
       href: "sim_quadcopter.html",
-      file: "sim_quadcopter.html",
       title: "Quadcopter Simulations",
       description: "Density thresholds and design trade-offs for quadcopters."
     },
     {
       href: "dl.html",
-      file: "dl.html",
       title: "Deep Learning",
       description: "Thermal imagery workflow for automated wildlife detection."
     }
@@ -45,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const url = new URL(window.location.href);
   const normalizedPath = url.pathname.replace(/\/+$/, "") || "/";
   const looksLikeDirectoryIndex = !/\.[^/]+$/.test(normalizedPath);
-  const matchesPage = (page) => normalizedPath === `/${page.href}` || normalizedPath.endsWith(`/${page.href}`) || (page.file === "index.html" && looksLikeDirectoryIndex);
+  const matchesPage = (page) => normalizedPath === `/${page.href}` || normalizedPath.endsWith(`/${page.href}`) || (page.href === "index.html" && looksLikeDirectoryIndex);
   const currentIndex = pages.findIndex((page) => matchesPage(page));
   const currentPage = currentIndex >= 0 ? pages[currentIndex] : null;
   const prevPage = currentIndex > 0 ? pages[currentIndex - 1] : null;
@@ -133,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
       href: page.href,
       label: page.title,
       description: page.description,
-      className: currentPage && page.file === currentPage.file ? "active" : ""
+      className: currentPage && page.href === currentPage.href ? "active" : ""
     });
     pagesSection.nav.appendChild(link);
   }
