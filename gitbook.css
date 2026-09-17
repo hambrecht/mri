@@ -6,6 +6,7 @@
   --gb-muted: #6b7280;
   --gb-accent: #2563eb;
   --gb-accent-soft: #dbeafe;
+  --gb-accent-border: #bfdbfe;
   --gb-sidebar-width: 19rem;
   --gb-content-width: 54rem;
 }
@@ -208,7 +209,7 @@ body.gitbook-ready #quarto-document-content h4 {
 
 .gitbook-page-link:hover,
 .gitbook-page-link:focus {
-  border-color: #bfdbfe;
+  border-color: var(--gb-accent-border);
   box-shadow: 0 10px 25px rgba(37, 99, 235, 0.08);
 }
 
