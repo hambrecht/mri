@@ -1,10 +1,11 @@
 ---
 title: "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose"
-format: html
+format:
+  html:
+    css: gitbook.css
+    include-after-body: gitbook-after-body.html
 page-layout: full
 ---
-
-| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Detection function](df.html) | [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"} | [fRI Research](https://friresearch.ca/){target="_blank"} | [Contact](mailto:137965368+hambrecht@users.noreply.github.com) |
 
 # Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose Detection and Population Estimation
 

@@ -1,10 +1,11 @@
 ---
 title: "Moose Research Initiative - Theme 4"
-format: html
+format:
+  html:
+    css: gitbook.css
+    include-after-body: gitbook-after-body.html
 page-layout: full
 ---
-
-| [Home](index.html) | [Simulations](sim.html) | [Deep Learning](dl.html) | [Detection function](df.html) |
 
 
 # Project Overview
