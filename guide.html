@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Simulations – Moose Research Initiative — Theme 4</title>
+<title>Best Practice Guide – Moose Research Initiative — Theme 4</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./sim_multiplatform.html" rel="next">
-<link href="./guide.html" rel="prev">
+<link href="./sim.html" rel="next">
+<link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./sim.html">Supporting Research</a></li><li class="breadcrumb-item"><a href="./sim.html">Simulations Overview</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./guide.html">Best Practice Guide</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -155,22 +155,22 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./guide.html" class="sidebar-item-text sidebar-link">
+  <a href="./guide.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Best Practice Guide</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Supporting Research</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sim.html" class="sidebar-item-text sidebar-link active">
+  <a href="./sim.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Simulations Overview</span></a>
   </div>
 </li>
@@ -204,17 +204,20 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose" id="toc-optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose" class="nav-link active" data-scroll-target="#optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose">Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose</a></li>
-  <li><a href="#when-is-a-quadcopter-the-right-tool-for-wildlife-surveys" id="toc-when-is-a-quadcopter-the-right-tool-for-wildlife-surveys" class="nav-link" data-scroll-target="#when-is-a-quadcopter-the-right-tool-for-wildlife-surveys">When Is a Quadcopter the Right Tool for Wildlife Surveys?</a></li>
+  <li><a href="#choose-your-platform" id="toc-choose-your-platform" class="nav-link active" data-scroll-target="#choose-your-platform">1. Choose Your Platform</a></li>
+  <li><a href="#design-your-survey" id="toc-design-your-survey" class="nav-link" data-scroll-target="#design-your-survey">2. Design Your Survey</a></li>
+  <li><a href="#configure-cameras-sensors" id="toc-configure-cameras-sensors" class="nav-link" data-scroll-target="#configure-cameras-sensors">3. Configure Cameras &amp; Sensors</a></li>
+  <li><a href="#process-review-imagery" id="toc-process-review-imagery" class="nav-link" data-scroll-target="#process-review-imagery">4. Process &amp; Review Imagery</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./sim.html">Supporting Research</a></li><li class="breadcrumb-item"><a href="./sim.html">Simulations Overview</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Simulations</h1>
+<h1 class="title">Best Practice Guide</h1>
 </div>
 
 
@@ -231,16 +234,64 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Two complementary simulation studies compare aerial platforms and survey designs for moose population monitoring in Alberta’s boreal forest.</p>
-<section id="optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose" class="level2">
-<h2 class="anchored" data-anchor-id="optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose"><a href="./sim_multiplatform.html">Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose</a></h2>
-<p>Fixed-wing drones, quadcopters, and conventional helicopters are compared across five Wildlife Management Units using line-transect distance sampling, testing how platform, camera configuration, and transect design affect accuracy and efficiency.</p>
-<p><strong>Authors</strong>: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse</p>
+<p>This guide distills our simulation and deep learning research into practical recommendations for planning drone-based moose surveys. Each recommendation links to the full study behind it.</p>
+<section id="choose-your-platform" class="level2">
+<h2 class="anchored" data-anchor-id="choose-your-platform">1. Choose Your Platform</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Recommended Platform &amp; Design</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Large area (&gt; 10 × 10 km), any density</td>
+<td>Fixed-wing drone with a zigzag transect design and line-transect distance sampling</td>
+<td><a href="./sim_multiplatform.html">Multi-platform Simulations</a></td>
+</tr>
+<tr class="even">
+<td>Small, accessible, or rugged area (≤ 10 × 10 km), density &gt; 400 individuals/1,000 km²</td>
+<td>Quadcopter with 0–10% overlap strip transects, 9–16 sample blocks</td>
+<td><a href="./sim_quadcopter.html">Quadcopter Simulations</a></td>
+</tr>
+<tr class="odd">
+<td>Small, accessible, or rugged area, density &lt; 400 individuals/1,000 km²</td>
+<td>Quadcopter with 65% overlap census, carefully reviewed to remove double-counted individuals — or reconsider a fixed-wing platform</td>
+<td><a href="./sim_quadcopter.html">Quadcopter Simulations</a></td>
+</tr>
+</tbody>
+</table>
+<p>Helicopters remain a robust baseline with the best coverage, but they are expensive, carry observer safety risk, and tend to underestimate density. Fixed-wing drones were the most accurate alternative across all tested densities. (<a href="./sim_multiplatform.html">Multi-platform Simulations</a>)</p>
 </section>
-<section id="when-is-a-quadcopter-the-right-tool-for-wildlife-surveys" class="level2">
-<h2 class="anchored" data-anchor-id="when-is-a-quadcopter-the-right-tool-for-wildlife-surveys"><a href="./sim_quadcopter.html">When Is a Quadcopter the Right Tool for Wildlife Surveys?</a></h2>
-<p>A systematic evaluation of five quadcopter survey designs across ten wildlife density levels, identifying the density thresholds and flight designs needed for reliable population estimates.</p>
-<p><strong>Authors</strong>: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse, Philip DeWitt, Jason Airst</p>
+<section id="design-your-survey" class="level2">
+<h2 class="anchored" data-anchor-id="design-your-survey">2. Design Your Survey</h2>
+<ul>
+<li><strong>Use zigzag transects for fixed-wing drones.</strong> They achieved up to 96.6% of flight time on-transect, compared to 80.5% for the helicopter’s segmented grid design. (<a href="./sim_multiplatform.html">Multi-platform Simulations</a>)</li>
+<li><strong>Avoid the 200 m fixed-spacing quadcopter design.</strong> It consistently overestimated population size and failed to meet the precision threshold at any density tested. (<a href="./sim_quadcopter.html">Quadcopter Simulations</a>)</li>
+<li><strong>Match sample block count to required precision.</strong> Quadcopter surveys needed 9–16 sample blocks at moderate-to-high densities, and all 25 blocks for the gimbal line-transect design to meet the CV ≤ 0.15 precision threshold. (<a href="./sim_quadcopter.html">Quadcopter Simulations</a>)</li>
+</ul>
+</section>
+<section id="configure-cameras-sensors" class="level2">
+<h2 class="anchored" data-anchor-id="configure-cameras-sensors">3. Configure Cameras &amp; Sensors</h2>
+<ul>
+<li><strong>Avoid nadir-only camera configurations.</strong> A straight-down camera assumes uniform detection within a narrow strip and significantly overestimates density. (<a href="./sim_multiplatform.html">Multi-platform Simulations</a>)</li>
+<li><strong>Equip quadcopters with a gimbal or dual-camera setup</strong> when a wider, angled field of view is needed — this brings quadcopter estimates much closer to fixed-wing accuracy. (<a href="./sim_multiplatform.html">Multi-platform Simulations</a>)</li>
+<li><strong>Use thermal infrared sensors for nighttime or low-visibility surveys.</strong> Thermal imagery mitigates visual occlusion and enables detection outside daylight hours. (<a href="./dl.html">Deep Learning</a>)</li>
+</ul>
+</section>
+<section id="process-review-imagery" class="level2">
+<h2 class="anchored" data-anchor-id="process-review-imagery">4. Process &amp; Review Imagery</h2>
+<p>Manual review of drone imagery is time-consuming, inefficient, and error-prone at scale. A multi-stage deep learning framework — first identifying candidate hotspots, then confirming species — automates detection and classification of moose and other terrestrial mammals from thermal footage, making large imagery volumes practical to review. (<a href="./dl.html">Deep Learning</a>)</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="./sim_multiplatform.html">Multi-platform Simulations</a> — full comparison of helicopter, fixed-wing, and quadcopter surveys</li>
+<li><a href="./sim_quadcopter.html">Quadcopter Simulations</a> — density thresholds and flight design trade-offs for quadcopters</li>
+<li><a href="./dl.html">Deep Learning</a> — automated detection pipeline for thermal drone imagery</li>
+</ul>
 
 
 </section>
@@ -653,13 +704,13 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./guide.html" class="pagination-link" aria-label="Best Practice Guide">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Best Practice Guide</span>
+      <a href="./index.html" class="pagination-link" aria-label="Home">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Home</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./sim_multiplatform.html" class="pagination-link" aria-label="Multi-platform Simulations">
-        <span class="nav-page-text">Multi-platform Simulations</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./sim.html" class="pagination-link" aria-label="Simulations Overview">
+        <span class="nav-page-text">Simulations Overview</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

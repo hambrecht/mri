@@ -1,0 +1,37 @@
+---
+title: "Best Practice Guide"
+---
+
+This guide distills our simulation and deep learning research into practical recommendations for planning drone-based moose surveys. Each recommendation links to the full study behind it.
+
+## 1. Choose Your Platform
+
+| Scenario | Recommended Platform & Design | Evidence |
+|---|---|---|
+| Large area (> 10 × 10 km), any density | Fixed-wing drone with a zigzag transect design and line-transect distance sampling | [Multi-platform Simulations](sim_multiplatform.qmd) |
+| Small, accessible, or rugged area (≤ 10 × 10 km), density > 400 individuals/1,000 km² | Quadcopter with 0–10% overlap strip transects, 9–16 sample blocks | [Quadcopter Simulations](sim_quadcopter.qmd) |
+| Small, accessible, or rugged area, density < 400 individuals/1,000 km² | Quadcopter with 65% overlap census, carefully reviewed to remove double-counted individuals — or reconsider a fixed-wing platform | [Quadcopter Simulations](sim_quadcopter.qmd) |
+
+Helicopters remain a robust baseline with the best coverage, but they are expensive, carry observer safety risk, and tend to underestimate density. Fixed-wing drones were the most accurate alternative across all tested densities. ([Multi-platform Simulations](sim_multiplatform.qmd))
+
+## 2. Design Your Survey
+
+- **Use zigzag transects for fixed-wing drones.** They achieved up to 96.6% of flight time on-transect, compared to 80.5% for the helicopter's segmented grid design. ([Multi-platform Simulations](sim_multiplatform.qmd))
+- **Avoid the 200 m fixed-spacing quadcopter design.** It consistently overestimated population size and failed to meet the precision threshold at any density tested. ([Quadcopter Simulations](sim_quadcopter.qmd))
+- **Match sample block count to required precision.** Quadcopter surveys needed 9–16 sample blocks at moderate-to-high densities, and all 25 blocks for the gimbal line-transect design to meet the CV ≤ 0.15 precision threshold. ([Quadcopter Simulations](sim_quadcopter.qmd))
+
+## 3. Configure Cameras & Sensors
+
+- **Avoid nadir-only camera configurations.** A straight-down camera assumes uniform detection within a narrow strip and significantly overestimates density. ([Multi-platform Simulations](sim_multiplatform.qmd))
+- **Equip quadcopters with a gimbal or dual-camera setup** when a wider, angled field of view is needed — this brings quadcopter estimates much closer to fixed-wing accuracy. ([Multi-platform Simulations](sim_multiplatform.qmd))
+- **Use thermal infrared sensors for nighttime or low-visibility surveys.** Thermal imagery mitigates visual occlusion and enables detection outside daylight hours. ([Deep Learning](dl.qmd))
+
+## 4. Process & Review Imagery
+
+Manual review of drone imagery is time-consuming, inefficient, and error-prone at scale. A multi-stage deep learning framework — first identifying candidate hotspots, then confirming species — automates detection and classification of moose and other terrestrial mammals from thermal footage, making large imagery volumes practical to review. ([Deep Learning](dl.qmd))
+
+## Further Reading
+
+- [Multi-platform Simulations](sim_multiplatform.qmd) — full comparison of helicopter, fixed-wing, and quadcopter surveys
+- [Quadcopter Simulations](sim_quadcopter.qmd) — density thresholds and flight design trade-offs for quadcopters
+- [Deep Learning](dl.qmd) — automated detection pipeline for thermal drone imagery

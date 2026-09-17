@@ -1,13 +1,6 @@
 ---
 title: "When Is a Quadcopter the Right Tool for Wildlife Surveys?"
-format:
-  html:
-    css: gitbook.css
-    include-after-body: gitbook-after-body.html
-page-layout: full
 ---
-
-# When Is a Quadcopter the Right Tool for Wildlife Surveys? Assessing Quadcopter Applications to Monitor Wildlife Populations
 
 **Authors**: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse, Philip DeWitt, Jason Airst
 
@@ -20,8 +13,6 @@ page-layout: full
 Quadcopters — compact, off-the-shelf multirotor drones — have become widely used for wildlife monitoring. They are inexpensive, easy to deploy in rugged terrain, and capable of carrying thermal cameras that detect animals day or night. But for all their appeal, a critical question has remained unanswered: *at what animal density do they actually produce reliable population estimates, and which flight design gets you there most efficiently?*
 
 This study addresses that gap through a systematic simulation study, evaluating five quadcopter survey designs across ten wildlife density levels in a controlled 10 × 10 km landscape. The goal is to give wildlife managers practical, evidence-based guidelines for deciding when — and how — to use a quadcopter for population surveys.
-
----
 
 ## Study Design
 
@@ -39,8 +30,6 @@ The area was divided into 2 × 2 km sample blocks, representing one day of surve
 
 Each of the 200 unique simulation scenarios was replicated 999 times. Performance was evaluated using bias, coefficient of variation (CV ≤ 0.15 as the precision threshold), and root mean square deviation (RMSE).
 
----
-
 ## Key Findings
 
 **The 65% overlap design is the most precise — but comes at a steep cost.** This design reliably met the CV threshold across all densities and block configurations, but required roughly eleven times more survey effort than the gimbal design. It also introduced a real risk of double-counting animals that moved between passes, a problem that must be carefully managed in the field.
@@ -53,8 +42,6 @@ Each of the 200 unique simulation scenarios was replicated 999 times. Performanc
 
 **Survey effort and precision are tightly linked.** Designs requiring 300–500 km of on-transect effort produced reliable estimates above ~800 individuals per 1,000 km²; efforts above 800 km extended reliability down to ~500 individuals per 1,000 km². At low densities, high overlap may be necessary — but introduces double-counting risks that require careful image review.
 
----
-
 ## Practical Recommendations
 
 **For densities above 400 individuals per 1,000 km²:** Use 0% or 10% overlap strip transects with 9–16 sample blocks. This balances accuracy and effort without the double-counting risks of high overlap.
@@ -64,8 +51,6 @@ Each of the 200 unique simulation scenarios was replicated 999 times. Performanc
 **For areas larger than 10 × 10 km:** Fixed-wing drones combined with line-transect distance sampling are a more efficient and rigorous option. Quadcopters are well-matched to small, accessible study areas where rugged terrain precludes fixed-wing operations.
 
 **Avoid the 200 m spacing design** for population estimation — its systematic overestimation makes it unsuitable regardless of effort.
-
----
 
 ## Why This Matters
 

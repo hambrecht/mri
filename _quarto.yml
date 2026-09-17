@@ -1,0 +1,74 @@
+project:
+  type: website
+  output-dir: "."
+  render:
+    - index.qmd
+    - guide.qmd
+    - sim.qmd
+    - sim_multiplatform.qmd
+    - sim_quadcopter.qmd
+    - dl.qmd
+
+website:
+  title: "Moose Research Initiative — Theme 4"
+  description: "Examining the feasibility of drones for wildlife surveys, as part of the Moose Research Initiative."
+  site-url: "https://hambrecht.github.io/mri/"
+  repo-url: "https://github.com/hambrecht/mri"
+  page-navigation: true
+  back-to-top-navigation: true
+
+  navbar:
+    background: white
+    foreground: dark
+    left:
+      - text: "IRSS"
+        href: "https://irsslab.forestry.ubc.ca/"
+        target: "_blank"
+      - text: "fRI Research"
+        href: "https://friresearch.ca/"
+        target: "_blank"
+    right:
+      - icon: envelope
+        href: "mailto:137965368+hambrecht@users.noreply.github.com"
+        text: "Contact"
+      - icon: github
+        href: "https://github.com/hambrecht/mri"
+
+  sidebar:
+    style: "docked"
+    search: true
+    collapse-level: 1
+    contents:
+      - text: "Home"
+        href: index.qmd
+      - text: "Best Practice Guide"
+        href: guide.qmd
+      - section: "Supporting Research"
+        contents:
+          - text: "Simulations Overview"
+            href: sim.qmd
+          - text: "Multi-platform Simulations"
+            href: sim_multiplatform.qmd
+          - text: "Quadcopter Simulations"
+            href: sim_quadcopter.qmd
+          - text: "Deep Learning"
+            href: dl.qmd
+
+  page-footer:
+    left: "Moose Research Initiative — Theme 4"
+    right:
+      - icon: github
+        href: "https://github.com/hambrecht/mri"
+
+format:
+  html:
+    theme: default
+    toc: true
+    toc-location: right
+    number-sections: false
+    grid:
+      sidebar-width: 300px
+      body-width: 850px
+      margin-width: 250px
+    fig-responsive: true
+    link-external-newwindow: true

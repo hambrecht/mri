@@ -1,0 +1,328 @@
+[
+  {
+    "objectID": "dl.html",
+    "href": "dl.html",
+    "title": "Deep Learning",
+    "section": "",
+    "text": "Author: Hiroto Goto, Nicholas C. Coops\nUnmanned Aerial Vehicles (UAVs) offer a promising alternative to conventional survey methods and can be equipped with thermal infrared sensors to mitigate visual occlusion and enable nighttime imaging. However, the large data volume generated from drone flights presents a significant bottleneck as manual review can be time-consuming, inefficient, and error prone. Recent advancements in deep learning have revolutionized the ability for automated wildlife detection from drone imagery using convolutional neural networks (CNNs). This study develops and validates a deep learning pipeline to automate the detection and classification of terrestrial mammals, including moose, across Canada’s forested boreal landscapes. Thermal footage was collected using a manually piloted fixed-wing UAV, and a multi-stage deep learning framework was implemented to identify candidate hotspots followed by species confirmation. The results demonstrate the feasibility of combining UAV thermal surveys with deep learning for scalable multi-species monitoring under challenging environmental conditions.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nVisible light (RGB) image of a conifer forest\nThermal image showing two animals\nIR image zoomed in on the thermal signatures\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Deep Learning"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html",
+    "href": "sim_multiplatform.html",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "",
+    "text": "Authors: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse\nKeywords: Alces alces, density estimation, detection function, distance sampling, survey design, thermal, UAV, UAS",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#overview",
+    "href": "sim_multiplatform.html#overview",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "Overview",
+    "text": "Overview\nAccurate moose population estimates are essential for wildlife management across Canada’s vast boreal landscapes, but conventional helicopter surveys come with significant costs: high expense, safety risks to observers, and increasing CO₂ emissions. Drone technology offers a compelling alternative — but how well does it actually perform?\nThis study uses a simulation-based framework to rigorously compare fixed-wing drones, quadcopters, and conventional helicopters for estimating moose (Alces alces) populations using line-transect distance sampling. Rather than running costly field trials across multiple designs, we simulated thousands of surveys using real moose population data from five Wildlife Management Units (WMUs) in Alberta, Canada — ranging from 2,132 to 12,034 km² — and tested how different platforms, camera configurations, and transect designs affect accuracy and efficiency.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#study-area",
+    "href": "sim_multiplatform.html#study-area",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "Study Area",
+    "text": "Study Area\nThe five WMUs are located north of Edmonton in Alberta’s boreal mixedwood forest. Moose densities varied from 0.085 to 0.442 moose/km², representing the low-density conditions typical of many large mammal surveys. These existing Government of Alberta helicopter survey data provided a realistic baseline for calibrating and comparing the simulations.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#what-we-tested",
+    "href": "sim_multiplatform.html#what-we-tested",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "What We Tested",
+    "text": "What We Tested\nWe compared three aerial platforms across multiple survey designs:\n\nHelicopter (baseline): segmented grid design with experienced human observers\nFixed-wing drone: systematic and zigzag transect designs\nQuadcopter: systematic subplot design with two camera options — nadir (straight down) and gimbal (angled sweep)\n\nCamera configuration was a key variable. We modeled three detection functions:\n\nNadir (straight-down camera): narrow 40 m strip half-width, uniform detection assumed\nTwo-camera / Gimbal: wider effective detection area, half-normal detection function — comparable to how biologists visually scan from a helicopter\n\nSimulations varied moose density at 100%, 75%, 50%, and 25% of observed levels to test performance under increasingly challenging low-density conditions.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#results",
+    "href": "sim_multiplatform.html#results",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "Results",
+    "text": "Results\n\n\n\nFigure 5. Mean estimated density for each simulation by WMU.\n\n\n\n\n\nFigure 6. Summary statistics of the estimated density for each simulation, averaged across all WMUs. The summary statistics include the relative mean density (A), bias (B), relative RMSE (C), proportion of times the 95% confidence interval contained the true density (D), mean standard error (E), coefficient of variation (F), mean encounter rate (G), and mean standard error of the encounter rate (H).\n\n\n\n\n\nFigure 7. Comparison of mean estimated density across different survey designs with varying input density levels (1x, 0.75x, 0.5x, 0.25x). The input densities are indicated by the dashed lines.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#key-findings",
+    "href": "sim_multiplatform.html#key-findings",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "Key Findings",
+    "text": "Key Findings\nHelicopters remain robust but tend to underestimate. The conventional segmented grid design achieved the highest survey coverage and performed well at low densities, but it systematically underestimated moose density — likely due to observer fatigue and imperfect detection near the transect line.\nFixed-wing drones are the most accurate alternative. Across all five WMUs and all density scenarios, fixed-wing drones using systematic or zigzag transects produced the most accurate density estimates. Even at low moose densities, the fixed-wing platform tracked the true density closely. The zigzag design was particularly efficient, spending up to 96.6% of flight time on-transect — compared to 80.5% for the helicopter.\nQuadcopters with nadir cameras significantly overestimate density. Because the nadir configuration assumes perfect, uniform detection within a narrow 40 m strip, it severely overestimates moose numbers. With an average survey coverage of less than 10% of the study area, the quadcopter nadir design is poorly suited for low-density, large-area surveys.\nQuadcopters improve substantially with a gimbal camera. When equipped with a gimbal that mimics the wider scanning angle of a helicopter observer, quadcopter estimates become much more comparable to fixed-wing results. However, coverage limitations persist — quadcopters simply cannot cover the same ground per unit time as a fixed-wing drone.\nEfficiency matters. The zigzag fixed-wing design achieved the highest on-transect proportion (96.6%), minimizing time and fuel spent repositioning between transect lines. The helicopter design, despite its high coverage, spent nearly 20% of flight time off-transect transitioning between segments.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#recommendations",
+    "href": "sim_multiplatform.html#recommendations",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "Recommendations",
+    "text": "Recommendations\n\nUse fixed-wing drones as the primary alternative to helicopters for large-area, low-density moose surveys. They deliver accurate estimates with comparable efficiency.\nAvoid nadir-only quadcopter configurations for population estimation — the narrow detection strip leads to severe overestimation.\nEquip quadcopters with a gimbal or dual-camera setup if they must be used, substantially improving accuracy while acknowledging remaining coverage constraints.\nApply zigzag transect designs for fixed-wing platforms to maximize on-transect efficiency.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_multiplatform.html#looking-ahead",
+    "href": "sim_multiplatform.html#looking-ahead",
+    "title": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "section": "Looking Ahead",
+    "text": "Looking Ahead\nThese simulation results provide strong evidence that drone-based surveys can match or exceed helicopter performance under the right conditions. However, real-world factors — canopy cover, snow conditions, temperature, and regulatory airspace restrictions — will influence operational outcomes. This work sets the stage for field validation and practical deployment guidelines for drone-based moose monitoring across Canada’s boreal forest.\n\nHambrecht, L., Coops, N. C., & Stenhouse, G. Optimizing wildlife survey design: Simulating drone and helicopter surveys for moose detection and population estimation. Manuscript in preparation.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Multi-platform Simulations"
+    ]
+  },
+  {
+    "objectID": "guide.html",
+    "href": "guide.html",
+    "title": "Best Practice Guide",
+    "section": "",
+    "text": "This guide distills our simulation and deep learning research into practical recommendations for planning drone-based moose surveys. Each recommendation links to the full study behind it.",
+    "crumbs": [
+      "IRSS",
+      "Best Practice Guide"
+    ]
+  },
+  {
+    "objectID": "guide.html#choose-your-platform",
+    "href": "guide.html#choose-your-platform",
+    "title": "Best Practice Guide",
+    "section": "1. Choose Your Platform",
+    "text": "1. Choose Your Platform\n\n\n\nScenario\nRecommended Platform & Design\nEvidence\n\n\n\n\nLarge area (&gt; 10 × 10 km), any density\nFixed-wing drone with a zigzag transect design and line-transect distance sampling\nMulti-platform Simulations\n\n\nSmall, accessible, or rugged area (≤ 10 × 10 km), density &gt; 400 individuals/1,000 km²\nQuadcopter with 0–10% overlap strip transects, 9–16 sample blocks\nQuadcopter Simulations\n\n\nSmall, accessible, or rugged area, density &lt; 400 individuals/1,000 km²\nQuadcopter with 65% overlap census, carefully reviewed to remove double-counted individuals — or reconsider a fixed-wing platform\nQuadcopter Simulations\n\n\n\nHelicopters remain a robust baseline with the best coverage, but they are expensive, carry observer safety risk, and tend to underestimate density. Fixed-wing drones were the most accurate alternative across all tested densities. (Multi-platform Simulations)",
+    "crumbs": [
+      "IRSS",
+      "Best Practice Guide"
+    ]
+  },
+  {
+    "objectID": "guide.html#design-your-survey",
+    "href": "guide.html#design-your-survey",
+    "title": "Best Practice Guide",
+    "section": "2. Design Your Survey",
+    "text": "2. Design Your Survey\n\nUse zigzag transects for fixed-wing drones. They achieved up to 96.6% of flight time on-transect, compared to 80.5% for the helicopter’s segmented grid design. (Multi-platform Simulations)\nAvoid the 200 m fixed-spacing quadcopter design. It consistently overestimated population size and failed to meet the precision threshold at any density tested. (Quadcopter Simulations)\nMatch sample block count to required precision. Quadcopter surveys needed 9–16 sample blocks at moderate-to-high densities, and all 25 blocks for the gimbal line-transect design to meet the CV ≤ 0.15 precision threshold. (Quadcopter Simulations)",
+    "crumbs": [
+      "IRSS",
+      "Best Practice Guide"
+    ]
+  },
+  {
+    "objectID": "guide.html#configure-cameras-sensors",
+    "href": "guide.html#configure-cameras-sensors",
+    "title": "Best Practice Guide",
+    "section": "3. Configure Cameras & Sensors",
+    "text": "3. Configure Cameras & Sensors\n\nAvoid nadir-only camera configurations. A straight-down camera assumes uniform detection within a narrow strip and significantly overestimates density. (Multi-platform Simulations)\nEquip quadcopters with a gimbal or dual-camera setup when a wider, angled field of view is needed — this brings quadcopter estimates much closer to fixed-wing accuracy. (Multi-platform Simulations)\nUse thermal infrared sensors for nighttime or low-visibility surveys. Thermal imagery mitigates visual occlusion and enables detection outside daylight hours. (Deep Learning)",
+    "crumbs": [
+      "IRSS",
+      "Best Practice Guide"
+    ]
+  },
+  {
+    "objectID": "guide.html#process-review-imagery",
+    "href": "guide.html#process-review-imagery",
+    "title": "Best Practice Guide",
+    "section": "4. Process & Review Imagery",
+    "text": "4. Process & Review Imagery\nManual review of drone imagery is time-consuming, inefficient, and error-prone at scale. A multi-stage deep learning framework — first identifying candidate hotspots, then confirming species — automates detection and classification of moose and other terrestrial mammals from thermal footage, making large imagery volumes practical to review. (Deep Learning)",
+    "crumbs": [
+      "IRSS",
+      "Best Practice Guide"
+    ]
+  },
+  {
+    "objectID": "guide.html#further-reading",
+    "href": "guide.html#further-reading",
+    "title": "Best Practice Guide",
+    "section": "Further Reading",
+    "text": "Further Reading\n\nMulti-platform Simulations — full comparison of helicopter, fixed-wing, and quadcopter surveys\nQuadcopter Simulations — density thresholds and flight design trade-offs for quadcopters\nDeep Learning — automated detection pipeline for thermal drone imagery",
+    "crumbs": [
+      "IRSS",
+      "Best Practice Guide"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Moose Research Initiative - Theme 4",
+    "section": "",
+    "text": "This site is a best practice guide for using drones in wildlife surveys, developed as part of the Moose Research Initiative, Theme 4. It turns our simulation and deep learning research into practical recommendations for choosing a survey platform, designing a flight plan, configuring cameras, and processing imagery.\nStart here → Best Practice Guide\nTheme 4 focuses on examining how historical and current forest management practices, along with conservation efforts aimed at species such as woodland caribou, impact moose populations and their habitat in Alberta. It assesses the feasibility and potential of unmanned aerial systems (drones) for wildlife surveys compared with current survey methods, across four objectives:\nThe supporting research behind these recommendations — simulation studies and a deep learning detection pipeline — is available for anyone who wants the full methodology and results.",
+    "crumbs": [
+      "IRSS",
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#members",
+    "href": "index.html#members",
+    "title": "Moose Research Initiative - Theme 4",
+    "section": "Members",
+    "text": "Members\n\n\n\n\n\n\n\nName\nPhoto\n\n\n\n\nNicholas C. Coops\n\n\n\nGord Stenhouse\n\n\n\nLeonard Hambrecht\n\n\n\nHiroto Goto",
+    "crumbs": [
+      "IRSS",
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#contact",
+    "href": "index.html#contact",
+    "title": "Moose Research Initiative - Theme 4",
+    "section": "Contact",
+    "text": "Contact\n\n\n\nName\nEmail\n\n\n\n\nLeonard Hambrecht\nhambrecht@users.noreply.github.com",
+    "crumbs": [
+      "IRSS",
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#website",
+    "href": "index.html#website",
+    "title": "Moose Research Initiative - Theme 4",
+    "section": "Website",
+    "text": "Website\nIRSS fRI Research",
+    "crumbs": [
+      "IRSS",
+      "Home"
+    ]
+  },
+  {
+    "objectID": "sim.html",
+    "href": "sim.html",
+    "title": "Simulations",
+    "section": "",
+    "text": "Two complementary simulation studies compare aerial platforms and survey designs for moose population monitoring in Alberta’s boreal forest.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Simulations Overview"
+    ]
+  },
+  {
+    "objectID": "sim.html#optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose",
+    "href": "sim.html#optimizing-wildlife-survey-design-simulating-drone-and-helicopter-surveys-for-moose",
+    "title": "Simulations",
+    "section": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose",
+    "text": "Optimizing Wildlife Survey Design: Simulating Drone and Helicopter Surveys for Moose\nFixed-wing drones, quadcopters, and conventional helicopters are compared across five Wildlife Management Units using line-transect distance sampling, testing how platform, camera configuration, and transect design affect accuracy and efficiency.\nAuthors: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Simulations Overview"
+    ]
+  },
+  {
+    "objectID": "sim.html#when-is-a-quadcopter-the-right-tool-for-wildlife-surveys",
+    "href": "sim.html#when-is-a-quadcopter-the-right-tool-for-wildlife-surveys",
+    "title": "Simulations",
+    "section": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "text": "When Is a Quadcopter the Right Tool for Wildlife Surveys?\nA systematic evaluation of five quadcopter survey designs across ten wildlife density levels, identifying the density thresholds and flight designs needed for reliable population estimates.\nAuthors: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse, Philip DeWitt, Jason Airst",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Simulations Overview"
+    ]
+  },
+  {
+    "objectID": "sim_quadcopter.html",
+    "href": "sim_quadcopter.html",
+    "title": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "section": "",
+    "text": "Authors: Leonard Hambrecht, Nicholas C. Coops, Gordon Stenhouse, Philip DeWitt, Jason Airst\nKeywords: Distance sampling, thermal, UAV, UAS, density, population estimate, detection function, survey design",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Quadcopter Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_quadcopter.html#overview",
+    "href": "sim_quadcopter.html#overview",
+    "title": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "section": "Overview",
+    "text": "Overview\nQuadcopters — compact, off-the-shelf multirotor drones — have become widely used for wildlife monitoring. They are inexpensive, easy to deploy in rugged terrain, and capable of carrying thermal cameras that detect animals day or night. But for all their appeal, a critical question has remained unanswered: at what animal density do they actually produce reliable population estimates, and which flight design gets you there most efficiently?\nThis study addresses that gap through a systematic simulation study, evaluating five quadcopter survey designs across ten wildlife density levels in a controlled 10 × 10 km landscape. The goal is to give wildlife managers practical, evidence-based guidelines for deciding when — and how — to use a quadcopter for population surveys.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Quadcopter Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_quadcopter.html#study-design",
+    "href": "sim_quadcopter.html#study-design",
+    "title": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "section": "Study Design",
+    "text": "Study Design\nWe built an artificial density surface model representing a 10 × 10 km study area with realistic spatial heterogeneity — clustered hotspots and low-use zones — similar to how large mammals actually distribute themselves across a landscape. We simulated wildlife populations ranging from 50 to 900 individuals per 1,000 km², covering the density ranges typical of deer, moose, elephants, and large carnivores.\nThe area was divided into 2 × 2 km sample blocks, representing one day of surveying under extended line-of-sight conditions. We tested configurations of 4, 9, 16, and 25 blocks and compared five flight designs:\n\n\n\n\n\n\n\nDesign\nDescription\n\n\n\n\n65% overlap\nStandard orthomosaic mapping overlap\n\n\n10% overlap\nMinimum supported by flight-planning software\n\n\n0% overlap\nNon-overlapping strip transects\n\n\n200 m spacing\nFixed wide spacing, manually planned\n\n\nGimbal (line transect)\nCamera pans left-right; half-normal detection function, 155 m half-width\n\n\n\nEach of the 200 unique simulation scenarios was replicated 999 times. Performance was evaluated using bias, coefficient of variation (CV ≤ 0.15 as the precision threshold), and root mean square deviation (RMSE).",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Quadcopter Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_quadcopter.html#key-findings",
+    "href": "sim_quadcopter.html#key-findings",
+    "title": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "section": "Key Findings",
+    "text": "Key Findings\nThe 65% overlap design is the most precise — but comes at a steep cost. This design reliably met the CV threshold across all densities and block configurations, but required roughly eleven times more survey effort than the gimbal design. It also introduced a real risk of double-counting animals that moved between passes, a problem that must be carefully managed in the field.\nThe 10% and 0% overlap designs hit a sweet spot for moderate-density populations. Above 400 individuals per 1,000 km², these designs achieved acceptable precision when 9–16 sample blocks were surveyed, with substantially less effort than the 65% design. They are the recommended choice for species in that density range.\nThe 200 m spacing design underperforms across the board. It consistently overestimated population size, failed to meet the precision threshold at any density, and produced insufficient detections at low densities. It is not recommended for population estimation.\nThe gimbal line-transect design requires high effort to work. Despite being the most effort-efficient per km flown, the gimbal design needed all 25 sample blocks to meet the CV threshold, and only did so at the highest tested density. For quadcopters operating within their typical 2 × 2 km range, the strip transect designs are more practical.\nSurvey effort and precision are tightly linked. Designs requiring 300–500 km of on-transect effort produced reliable estimates above ~800 individuals per 1,000 km²; efforts above 800 km extended reliability down to ~500 individuals per 1,000 km². At low densities, high overlap may be necessary — but introduces double-counting risks that require careful image review.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Quadcopter Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_quadcopter.html#practical-recommendations",
+    "href": "sim_quadcopter.html#practical-recommendations",
+    "title": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "section": "Practical Recommendations",
+    "text": "Practical Recommendations\nFor densities above 400 individuals per 1,000 km²: Use 0% or 10% overlap strip transects with 9–16 sample blocks. This balances accuracy and effort without the double-counting risks of high overlap.\nFor densities below 400 individuals per 1,000 km²: Use 65% overlap with a census approach and carefully review images to remove double-counted individuals. Alternatively, reconsider whether a quadcopter is the right platform — low-density, large-area surveys may be better served by a fixed-wing drone.\nFor areas larger than 10 × 10 km: Fixed-wing drones combined with line-transect distance sampling are a more efficient and rigorous option. Quadcopters are well-matched to small, accessible study areas where rugged terrain precludes fixed-wing operations.\nAvoid the 200 m spacing design for population estimation — its systematic overestimation makes it unsuitable regardless of effort.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Quadcopter Simulations"
+    ]
+  },
+  {
+    "objectID": "sim_quadcopter.html#why-this-matters",
+    "href": "sim_quadcopter.html#why-this-matters",
+    "title": "When Is a Quadcopter the Right Tool for Wildlife Surveys?",
+    "section": "Why This Matters",
+    "text": "Why This Matters\nAs drone technology becomes more accessible, the temptation to use a quadcopter for everything grows. This study provides a clear-eyed assessment of where quadcopters genuinely excel (moderate-to-high density, small study areas, rugged terrain) and where their limitations become a liability (large areas, low-density species, extensive coverage requirements). By matching the tool to the task, wildlife managers can get rigorous, cost-effective population estimates — and avoid the pitfall of precise-sounding numbers that are quietly biased.\n\nHambrecht, L., Coops, N. C., Stenhouse, G., DeWitt, P., & Airst, J. When is a quadcopter the right tool for wildlife surveys? Assessing quadcopter applications to monitor populations. Manuscript in preparation.",
+    "crumbs": [
+      "IRSS",
+      "Supporting Research",
+      "Quadcopter Simulations"
+    ]
+  }
+]

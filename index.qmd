@@ -1,26 +1,22 @@
 ---
 title: "Moose Research Initiative - Theme 4"
-format:
-  html:
-    css: gitbook.css
-    include-after-body: gitbook-after-body.html
-page-layout: full
 ---
 
+This site is a **best practice guide** for using drones in wildlife surveys, developed as part of the [Moose Research Initiative](https://friresearch.ca/project/moose-research-initiative), Theme 4. It turns our simulation and deep learning research into practical recommendations for choosing a survey platform, designing a flight plan, configuring cameras, and processing imagery.
 
-# Project Overview
+**Start here → [Best Practice Guide](guide.qmd)**
 
-This research is part of the [Moose Research Initiative](https://friresearch.ca/project/moose-research-initiative) and Theme 4 focuses on examining how historical and current forest management practices, along with conservation efforts aimed at species such as woodland caribou, impact moose populations and their habitat in Alberta. Additionally, there is a need to enhance monitoring techniques for moose in forested areas and evaluate the effects of climate change on moose populations and their habitat in the future.
-
-Theme 4 aims to assess the feasibility and potential of unmanned aerial systems (referred to as drones) for wildlife surveys, comparing them with current survey methods. The theme encompasses four primary objectives:
+Theme 4 focuses on examining how historical and current forest management practices, along with conservation efforts aimed at species such as woodland caribou, impact moose populations and their habitat in Alberta. It assesses the feasibility and potential of unmanned aerial systems (drones) for wildlife surveys compared with current survey methods, across four objectives:
 
 1. Statistical validity of different drone data acquisition flight plans
 2. Validation of detection of moose on snow using thermal / RGB cameras
 3. Full-scale proof of concept and scaling to fixed-wing operational solutions
-4. Best practice guide
+4. Best practice guide (this site)
+
+The [supporting research](sim.qmd) behind these recommendations — simulation studies and a deep learning detection pipeline — is available for anyone who wants the full methodology and results.
 
 ## Members
-|  |  |
+| Name | Photo |
 |:--:|:--:|
 | Nicholas C. Coops | ![](https://irss.sites.olt.ubc.ca/files/2021/06/Nicholas3-scaled.jpg) |
 | Gord Stenhouse | ![](https://friresearch.ca/data/Gord.jpg) |
