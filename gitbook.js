@@ -42,7 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const shell = document.getElementById("quarto-content");
   if (!main || !shell || document.body.classList.contains("gitbook-ready")) return;
 
-  const path = window.location.pathname.split("/").pop() || "index.html";
+  const url = new URL(window.location.href);
+  const segments = url.pathname.split("/").filter(Boolean);
+  const lastSegment = segments[segments.length - 1] || "";
+  const path = lastSegment.endsWith(".html") ? lastSegment : "index.html";
   const currentIndex = pages.findIndex((page) => page.file === path);
   const currentPage = currentIndex >= 0 ? pages[currentIndex] : null;
   const prevPage = currentIndex > 0 ? pages[currentIndex - 1] : null;
@@ -85,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (className) link.className = className;
     if (external) {
       link.target = "_blank";
-      link.rel = "noreferrer";
+      link.rel = "noopener noreferrer";
     }
     link.append(label);
     if (description) {
