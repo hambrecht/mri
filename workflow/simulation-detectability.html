@@ -9,7 +9,7 @@
 <meta name="author" content="Leonard Hambrecht, IRSS, University of British Columbia">
 <meta name="dcterms.date" content="2026-09-01">
 
-<title>Simulating surveys with spatially varying detectability – Moose Research Initiative — Theme 4</title>
+<title>Simulating spatially varying detectability – Moose Research Initiative — Theme 4</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -92,6 +92,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../workflow/simulation-multispecies.html" rel="next">
 <link href="../workflow/simulation-design.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -344,6 +345,12 @@ window.Quarto = {
  <span class="menu-text">Spatially varying detectability</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/simulation-multispecies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi-species survey</span></a>
+  </div>
+</li>
       </ul>
   </li>
       </ul>
@@ -362,8 +369,8 @@ window.Quarto = {
   <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
   <li><a href="#the-covariate-surface" id="toc-the-covariate-surface" class="nav-link" data-scroll-target="#the-covariate-surface">The covariate surface</a></li>
   <li><a href="#detectability-that-depends-on-canopy" id="toc-detectability-that-depends-on-canopy" class="nav-link" data-scroll-target="#detectability-that-depends-on-canopy">Detectability that depends on canopy</a></li>
-  <li><a href="#analyses" id="toc-analyses" class="nav-link" data-scroll-target="#analyses">Analyses</a></li>
-  <li><a href="#running-the-simulations" id="toc-running-the-simulations" class="nav-link" data-scroll-target="#running-the-simulations">Running the simulations</a></li>
+  <li><a href="#one-simulated-survey" id="toc-one-simulated-survey" class="nav-link" data-scroll-target="#one-simulated-survey">One simulated survey</a></li>
+  <li><a href="#simulations" id="toc-simulations" class="nav-link" data-scroll-target="#simulations">Simulations</a></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
   <li><a href="#saving" id="toc-saving" class="nav-link" data-scroll-target="#saving">Saving</a></li>
@@ -376,7 +383,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../workflow/index.html">R Workflow</a></li><li class="breadcrumb-item"><a href="../workflow/simulation-density.html">Survey simulation</a></li><li class="breadcrumb-item"><a href="../workflow/simulation-detectability.html">Spatially varying detectability</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Simulating surveys with spatially varying detectability</h1>
+<h1 class="title">Simulating spatially varying detectability</h1>
 </div>
 
 
@@ -407,10 +414,11 @@ window.Quarto = {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In the RMNP survey, moose were harder to detect under dense canopy: the <a href="../workflow/detection-function.html">detection function</a> with canopy cover (<code>pabove2</code>) was clearly better supported than one without it. Detectability therefore varies across the landscape, and so does the proportion of animals a survey misses. Whether this matters depends on the design. A design across the whole park samples all canopy conditions in proportion to their area, but subplots may by chance fall in denser or more open forest than the park as a whole.</p>
-<p>Simulations normally draw detectability from a fixed detection function, or from individual covariates such as group size that are unrelated to location. The <a href="https://github.com/hambrecht/dsims">fork of <code>dsims</code></a> adds <em>spatial</em> covariates: <code>make.detectability()</code> takes a raster through the new <code>cov.surface</code> argument, and at every repetition reads the raster at each simulated animal’s location. The animal’s scale parameter is then</p>
+<p>In the RMNP survey, animals were harder to detect under dense canopy: the <a href="../workflow/detection-function.html">detection function</a> with lidar canopy cover (<code>pabove2</code>) was clearly better supported than one without it. Detectability therefore varies across the landscape with the forest, and so does the proportion of animals a survey misses.</p>
+<p>Simulations normally draw detectability from a fixed detection function, or from individual covariates such as group size that are unrelated to location. The <a href="https://github.com/hambrecht/dsims">fork of <code>dsims</code></a> adds <em>spatial</em> covariates: <code>make.detectability()</code> takes a raster through the new <code>cov.surface</code> argument, and at every repetition reads the raster at each simulated animal’s location. The scale parameter of animal <span class="math inline">\(i\)</span> is then</p>
 <p><span class="math display">\[\log(\sigma_i) = \log(\sigma_0) + \beta z_i,\]</span></p>
-<p>where <span class="math inline">\(z_i\)</span> is the raster value at the animal, <span class="math inline">\(\beta\)</span> the coefficient in <code>cov.param</code>, and <span class="math inline">\(\sigma_0\)</span> the scale parameter. This is the same log-linear form that <code>Distance</code> uses for covariates, so the fitted coefficients can be used directly. This article is the first documentation of the feature.</p>
+<p>where <span class="math inline">\(z_i\)</span> is the raster value at the animal, <span class="math inline">\(\beta\)</span> the coefficient given in <code>cov.param</code>, and <span class="math inline">\(\sigma_0\)</span> the scale parameter. This is the same log-linear form that <code>Distance</code> uses for covariates, so the fitted coefficients can be used directly. This article is the first documentation of the feature.</p>
+<p>The survey design is fixed throughout: the segmented grid of 10 km north–south transects that is the standard design for aerial ungulate surveys in Alberta (see <a href="../workflow/simulation-design.html#a-segmented-grid-design"><em>Survey designs with subplots</em></a>). Only detectability and the analysis change. We simulate the moose survey three times: with constant detectability, and with canopy-dependent detectability analysed with and without the canopy covariate. This shows what the covariate changes in the simulated data and whether the analysis has to account for it.</p>
 </section>
 <section id="prerequisites" class="level2">
 <h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
@@ -424,45 +432,41 @@ window.Quarto = {
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="st">"cov.surface"</span> <span class="sc">%in%</span> <span class="fu">names</span>(<span class="fu">formals</span>(make.detectability)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We load the region, population and detection function parameters from <a href="../workflow/simulation-density.html"><em>From density surface model to simulation</em></a>, and the designs from <a href="../workflow/simulation-design.html"><em>Survey designs with subplots</em></a>.</p>
+<p>We load the region, populations and detection function parameters from <a href="../workflow/simulation-density.html"><em>From density surface model to simulation</em></a>, and the segmented grid design from <a href="../workflow/simulation-design.html"><em>Survey designs with subplots</em></a>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list2env</span>(<span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"simulation_setup.rds"</span>)), <span class="at">envir =</span> <span class="fu">environment</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;environment: R_GlobalEnv&gt;</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list2env</span>(<span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"simulation_designs.rds"</span>)), <span class="at">envir =</span> <span class="fu">environment</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>&lt;environment: R_GlobalEnv&gt;</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>design_seg <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"simulation_designs.rds"</span>))<span class="sc">$</span>design_seg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-covariate-surface" class="level2">
 <h2 class="anchored" data-anchor-id="the-covariate-surface">The covariate surface</h2>
-<p>The raster is read at the animals’ <code>x</code> and <code>y</code> coordinates, so it must be in the same CRS as the region. We project the canopy cover layer and write it to a GeoTIFF. A file path is better than an in-memory raster for parallel runs, because each worker then reads the file itself instead of receiving a copy of the raster.</p>
+<p><code>cov.surface</code> takes a single-layer raster, read at the animals’ <code>x</code> and <code>y</code> coordinates, so it must be in the same CRS as the region. We write the canopy cover layer to its own GeoTIFF. A file path is better than an in-memory raster for parallel runs, because each worker then reads the file itself instead of receiving a copy of the raster.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>canopy <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"lidar"</span>, <span class="st">"lidar_pabove2_zmax_30m.tif"</span>))[[<span class="dv">1</span>]] <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">project</span>(<span class="fu">paste0</span>(<span class="st">"EPSG:"</span>, LOCAL))</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(canopy) <span class="ot">&lt;-</span> <span class="st">"pabove2"</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>canopy_file <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"pabove2_local.tif"</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(canopy, canopy_file, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lidar <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"lidar"</span>, <span class="st">"lidar_pabove2_zmax_10m.tif"</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">same.crs</span>(lidar, region<span class="sc">@</span>region))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>canopy_file <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"pabove2_10m.tif"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(lidar[[<span class="dv">1</span>]], canopy_file, <span class="at">overwrite =</span> <span class="cn">TRUE</span>, <span class="at">names =</span> <span class="st">"pabove2"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Animals outside the raster, here the 3.5% of the park without lidar data, get the raster mean, and <code>dsims</code> warns when this happens.</p>
+<p>Animals outside the raster, here in the part of the park without lidar data, get the raster mean, and <code>dsims</code> warns when this happens.</p>
 </section>
 <section id="detectability-that-depends-on-canopy" class="level2">
 <h2 class="anchored" data-anchor-id="detectability-that-depends-on-canopy">Detectability that depends on canopy</h2>
-<p>We use the fitted hazard-rate detection function for moose: the scale parameter at zero canopy cover (<code>scale_moose</code>), the shape parameter, and the canopy coefficient <code>beta_pabove2</code>. The name of the entry in <code>cov.surface</code> must match the name in <code>cov.param</code>.</p>
+<p>We use the fitted hazard-rate detection function for moose: the scale parameter at zero canopy cover, the shape parameter, and the canopy coefficient. The name of the entry in <code>cov.surface</code> must match the name in <code>cov.param</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>detect_canopy <span class="ot">&lt;-</span> <span class="fu">make.detectability</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">key.function =</span> <span class="st">"hr"</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale.param =</span> scale_moose,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape.param =</span> shape,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov.param =</span> <span class="fu">list</span>(<span class="at">pabove2 =</span> beta_pabove2),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov.surface =</span> <span class="fu">list</span>(<span class="at">pabove2 =</span> canopy_file),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">truncation =</span> TRUNCATION_M</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>detect_canopy <span class="ot">&lt;-</span> <span class="fu">make.detectability</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">key.function =</span> <span class="st">"hr"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale.param =</span> scale_species[[<span class="st">"Moose"</span>]],</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape.param =</span> shape,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov.param =</span> <span class="fu">list</span>(<span class="at">pabove2 =</span> beta_pabove2),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov.surface =</span> <span class="fu">list</span>(<span class="at">pabove2 =</span> canopy_file),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">truncation =</span> TRUNCATION_M</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(detect_canopy, pop_desc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(detect_canopy, pop_descs<span class="sc">$</span>Moose)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-detectability" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -470,33 +474,37 @@ window.Quarto = {
 <img src="simulation-detectability_files/figure-html/fig-detectability-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-detectability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Detection function for simulated moose at the mean canopy cover of the raster (solid), and at the canopy values that bound 95% of the raster (dashed).
+Figure&nbsp;1: Moose detection function at the mean canopy cover of the raster (solid), and at the canopy values that bound 95% of the raster (dashed).
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>A single simulated survey shows the covariate at work. The canopy value at each detected animal is carried into the survey data, where the analysis can use it.</p>
+<p>The dashed lines show the range of the covariate effect: detection probability is highest in the open and lowest under the densest canopy. Most of the park lies between these extremes.</p>
+</section>
+<section id="one-simulated-survey" class="level2">
+<h2 class="anchored" data-anchor-id="one-simulated-survey">One simulated survey</h2>
+<p>A single simulated survey shows the covariate at work. The canopy value at each detected group is carried into the survey data, where the analysis can use it.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sim_one <span class="ot">&lt;-</span> <span class="fu">make.simulation</span>(<span class="at">reps =</span> <span class="dv">1</span>, <span class="at">design =</span> design_full, <span class="at">population.description =</span> pop_desc,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">detectability =</span> detect_canopy,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ds.analysis =</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">key =</span> <span class="st">"hr"</span>, <span class="at">truncation =</span> TRUNCATION_M))</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>survey <span class="ot">&lt;-</span> <span class="fu">run.survey</span>(sim_one)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>detections <span class="ot">&lt;-</span> survey<span class="sc">@</span>dist.data[<span class="sc">!</span><span class="fu">is.na</span>(survey<span class="sc">@</span>dist.data<span class="sc">$</span>object), ]</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(detections)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sim_one <span class="ot">&lt;-</span> <span class="fu">make.simulation</span>(<span class="at">reps =</span> <span class="dv">1</span>, <span class="at">design =</span> design_seg, <span class="at">population.description =</span> pop_descs<span class="sc">$</span>Moose,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">detectability =</span> detect_canopy,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ds.analysis =</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">key =</span> <span class="st">"hr"</span>, <span class="at">truncation =</span> TRUNCATION_M))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>survey <span class="ot">&lt;-</span> <span class="fu">run.survey</span>(sim_one)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>detections <span class="ot">&lt;-</span> survey<span class="sc">@</span>dist.data[<span class="sc">!</span><span class="fu">is.na</span>(survey<span class="sc">@</span>dist.data<span class="sc">$</span>object), ]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(detections)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 229</code></pre>
+<pre><code>[1] 102</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>detections<span class="sc">$</span>canopy_class <span class="ot">&lt;-</span> <span class="fu">cut</span>(detections<span class="sc">$</span>pabove2, <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="cn">Inf</span>),</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"&lt; 20%"</span>, <span class="st">"20-30%"</span>, <span class="st">"&gt; 30%"</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(detections, <span class="fu">aes</span>(distance)) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">25</span>, <span class="at">boundary =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>canopy_class) <span class="sc">+</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Distance (m)"</span>, <span class="at">y =</span> <span class="st">"Detections"</span>) <span class="sc">+</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>detections<span class="sc">$</span>canopy <span class="ot">&lt;-</span> <span class="fu">cut</span>(detections<span class="sc">$</span>pabove2, <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="cn">Inf</span>),</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"pabove2 &lt; 20%"</span>, <span class="st">"20-30%"</span>, <span class="st">"&gt; 30%"</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(detections, <span class="fu">aes</span>(distance)) <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">25</span>, <span class="at">boundary =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>canopy) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Distance (m)"</span>, <span class="at">y =</span> <span class="st">"Detections"</span>) <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-one-survey" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -504,161 +512,119 @@ Figure&nbsp;1: Detection function for simulated moose at the mean canopy cover o
 <img src="simulation-detectability_files/figure-html/fig-one-survey-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-one-survey-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Distances of detections in one simulated survey, by canopy cover at the animal.
+Figure&nbsp;2: Distances of detected moose groups in one simulated survey, by canopy cover at the group.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>With the weak canopy effect estimated from the 10 m lidar, the distance distributions differ only a little between canopy classes.</p>
 </section>
-<section id="analyses" class="level2">
-<h2 class="anchored" data-anchor-id="analyses">Analyses</h2>
-<p>Each simulated survey is analysed in two ways. The first ignores canopy (<code>~1</code>) and relies on <em>pooling robustness</em>: the property that a detection function without covariates can still estimate density without bias when detectability varies between animals <span class="citation" data-cites="buckland2001">(<a href="#ref-buckland2001" role="doc-biblioref">Buckland et al. 2001</a>)</span>. The second offers AIC a choice between <code>~1</code> and <code>~pabove2</code>, as in the real analysis. Both use the hazard-rate key.</p>
+<section id="simulations" class="level2">
+<h2 class="anchored" data-anchor-id="simulations">Simulations</h2>
+<p>We run three simulations of the segmented grid design, each with 100 repetitions:</p>
+<ul>
+<li><strong>constant</strong>: the constant detection function from <a href="../workflow/simulation-density.html#defining-detectability"><em>From density surface model to simulation</em></a>, analysed without covariates (<code>~1</code>). This is the reference.</li>
+<li><strong>canopy, <code>~1</code></strong>: canopy-dependent detectability, analysed without covariates. The analysis relies on <em>pooling robustness</em>: a detection function without covariates can still estimate density without bias when detectability varies between animals <span class="citation" data-cites="buckland2001">(<a href="#ref-buckland2001" role="doc-biblioref">Buckland et al. 2001</a>)</span>.</li>
+<li><strong>canopy, AIC</strong>: canopy-dependent detectability, with AIC choosing between <code>~1</code> and <code>~pabove2</code>, as in the real analysis.</li>
+</ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>analysis_null <span class="ot">&lt;-</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">key =</span> <span class="st">"hr"</span>, <span class="at">truncation =</span> TRUNCATION_M)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>analysis_canopy <span class="ot">&lt;-</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="fu">list</span>(<span class="sc">~</span><span class="dv">1</span>, <span class="sc">~</span>pabove2), <span class="at">key =</span> <span class="fu">c</span>(<span class="st">"hr"</span>, <span class="st">"hr"</span>),</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">truncation =</span> TRUNCATION_M, <span class="at">criteria =</span> <span class="st">"AIC"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>analysis_null <span class="ot">&lt;-</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">key =</span> <span class="st">"hr"</span>, <span class="at">truncation =</span> TRUNCATION_M)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>analysis_canopy <span class="ot">&lt;-</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="fu">list</span>(<span class="sc">~</span><span class="dv">1</span>, <span class="sc">~</span>pabove2), <span class="at">key =</span> <span class="fu">c</span>(<span class="st">"hr"</span>, <span class="st">"hr"</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">truncation =</span> TRUNCATION_M, <span class="at">criteria =</span> <span class="st">"AIC"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>For the subplot designs, the subplots are strata of the design but should be analysed together, like the grouped strata in the <code>dsims</code> article <a href="https://distancesampling.org/dsims/articles/dsims_grouped_strata.html"><em>Grouped strata</em></a>. <code>group.strata</code> maps every subplot to a single analysis stratum.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>group_all <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">design.id =</span> sub_region<span class="sc">@</span>strata.name, <span class="at">analysis.id =</span> <span class="st">"subplots"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>analysis_null_sub <span class="ot">&lt;-</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">key =</span> <span class="st">"hr"</span>, <span class="at">truncation =</span> TRUNCATION_M,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">group.strata =</span> group_all)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>analysis_canopy_sub <span class="ot">&lt;-</span> <span class="fu">make.ds.analysis</span>(<span class="at">dfmodel =</span> <span class="fu">list</span>(<span class="sc">~</span><span class="dv">1</span>, <span class="sc">~</span>pabove2), <span class="at">key =</span> <span class="fu">c</span>(<span class="st">"hr"</span>, <span class="st">"hr"</span>),</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">truncation =</span> TRUNCATION_M, <span class="at">criteria =</span> <span class="st">"AIC"</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">group.strata =</span> group_all)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="running-the-simulations" class="level2">
-<h2 class="anchored" data-anchor-id="running-the-simulations">Running the simulations</h2>
-<p>Six simulations combine the three designs with the two analyses, each with 100 repetitions. Every repetition generates a new population, a new set of transects and new detections, and fits the detection function. The simulations run in parallel and take several minutes each; for your own designs, start with 20 repetitions to check the setup.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>REPS <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>run <span class="ot">&lt;-</span> <span class="cf">function</span>(design, pop, analysis) {</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  sim <span class="ot">&lt;-</span> <span class="fu">make.simulation</span>(<span class="at">reps =</span> REPS, <span class="at">design =</span> design, <span class="at">population.description =</span> pop,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">detectability =</span> detect_canopy, <span class="at">ds.analysis =</span> analysis)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run.simulation</span>(sim, <span class="at">run.parallel =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"whole park, systematic"</span>, <span class="st">"subplots, systematic"</span>, <span class="st">"subplots, zigzag"</span>), <span class="at">each =</span> <span class="dv">2</span>),</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">analysis =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"~1"</span>, <span class="st">"AIC: ~1 or ~pabove2"</span>), <span class="dv">3</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>sims <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(design_full, pop_desc, analysis_null),</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(design_full, pop_desc, analysis_canopy),</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(design_sys, pop_desc_sub, analysis_null_sub),</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(design_sys, pop_desc_sub, analysis_canopy_sub),</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(design_zz, pop_desc_sub, analysis_null_sub),</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(design_zz, pop_desc_sub, analysis_canopy_sub)</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(<span class="fu">list</span>(<span class="at">scenarios =</span> scenarios, <span class="at">sims =</span> sims), <span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"simulations.rds"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>REPS <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>run <span class="ot">&lt;-</span> <span class="cf">function</span>(detect, analysis) {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  sim <span class="ot">&lt;-</span> <span class="fu">make.simulation</span>(<span class="at">reps =</span> REPS, <span class="at">design =</span> design_seg, <span class="at">population.description =</span> pop_descs<span class="sc">$</span>Moose,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">detectability =</span> detect, <span class="at">ds.analysis =</span> analysis)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run.simulation</span>(sim, <span class="at">run.parallel =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"constant, ~1"</span>, <span class="st">"canopy, ~1"</span>, <span class="st">"canopy, AIC"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>sims <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(detect_constant, analysis_null),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(detect_canopy, analysis_null),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(detect_canopy, analysis_canopy)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(sims) <span class="ot">&lt;-</span> scenarios</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="results" class="level2">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
-<p>We compare the designs on density, because the subplot designs estimate density within the subplots, not across the whole park. For each simulation we extract the true and mean estimated density (animals per km²), the bias, the root mean squared error relative to the true density (RRMSE), the proportion of 95% confidence intervals that contain the true value, and the mean coefficient of variation.</p>
+<p>For each simulation we extract the density of individuals (true and mean estimate, animals per km²), the bias, the root mean squared error relative to the true density (RRMSE), the proportion of 95% confidence intervals containing the true density, and the mean coefficient of variation. We also compare the true average detection probability of the groups in the covered area (<span class="math inline">\(P_a\)</span>) with its estimate.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sim_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(sim) {</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">summary</span>(sim, <span class="at">description.summary =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  D <span class="ot">&lt;-</span> s<span class="sc">@</span>individuals<span class="sc">$</span>D</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  D <span class="ot">&lt;-</span> D[<span class="fu">nrow</span>(D), ] <span class="co"># the total, or the single analysis stratum</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">true_D =</span> D<span class="sc">$</span>Truth <span class="sc">*</span> <span class="fl">1e6</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_D =</span> D<span class="sc">$</span>mean.Estimate <span class="sc">*</span> <span class="fl">1e6</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">bias_pct =</span> D<span class="sc">$</span>percent.bias,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">rrmse =</span> D<span class="sc">$</span>RMSE <span class="sc">/</span> D<span class="sc">$</span>Truth,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_coverage =</span> D<span class="sc">$</span>CI.coverage.prob,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_cv =</span> D<span class="sc">$</span>mean.se <span class="sc">/</span> D<span class="sc">$</span>mean.Estimate</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">cbind</span>(scenarios, <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(sims, sim_metrics)))</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(results, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sim_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(sim) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">summary</span>(sim, <span class="at">description.summary =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  D <span class="ot">&lt;-</span> s<span class="sc">@</span>individuals<span class="sc">$</span>D[<span class="fu">nrow</span>(s<span class="sc">@</span>individuals<span class="sc">$</span>D), ]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  det <span class="ot">&lt;-</span> s<span class="sc">@</span>detection</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">true_D =</span> D<span class="sc">$</span>Truth <span class="sc">*</span> <span class="fl">1e6</span>, <span class="at">mean_D =</span> D<span class="sc">$</span>mean.Estimate <span class="sc">*</span> <span class="fl">1e6</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">bias_pct =</span> D<span class="sc">$</span>percent.bias, <span class="at">rrmse =</span> D<span class="sc">$</span>RMSE <span class="sc">/</span> D<span class="sc">$</span>Truth,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">ci_coverage =</span> D<span class="sc">$</span>CI.coverage.prob, <span class="at">mean_cv =</span> D<span class="sc">$</span>mean.se <span class="sc">/</span> D<span class="sc">$</span>mean.Estimate,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">true_Pa =</span> det<span class="sc">$</span>mean.observed.Pa[<span class="fu">nrow</span>(det)], <span class="at">est_Pa =</span> det<span class="sc">$</span>mean.estimate.Pa[<span class="fu">nrow</span>(det)])</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">scenario =</span> scenarios, <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(sims, sim_metrics)))</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(results) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(results, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 21%">
-<col style="width: 7%">
-<col style="width: 7%">
+<col style="width: 16%">
 <col style="width: 9%">
-<col style="width: 6%">
-<col style="width: 13%">
-<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 9%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">design</th>
-<th style="text-align: left;">analysis</th>
+<th style="text-align: left;">scenario</th>
 <th style="text-align: right;">true_D</th>
 <th style="text-align: right;">mean_D</th>
 <th style="text-align: right;">bias_pct</th>
 <th style="text-align: right;">rrmse</th>
 <th style="text-align: right;">ci_coverage</th>
 <th style="text-align: right;">mean_cv</th>
+<th style="text-align: right;">true_Pa</th>
+<th style="text-align: right;">est_Pa</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">whole park, systematic</td>
-<td style="text-align: left;">~1</td>
-<td style="text-align: right;">0.143</td>
-<td style="text-align: right;">0.146</td>
-<td style="text-align: right;">1.960</td>
-<td style="text-align: right;">0.099</td>
-<td style="text-align: right;">0.96</td>
-<td style="text-align: right;">0.103</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">whole park, systematic</td>
-<td style="text-align: left;">AIC: ~1 or ~pabove2</td>
-<td style="text-align: right;">0.143</td>
-<td style="text-align: right;">0.146</td>
-<td style="text-align: right;">1.796</td>
-<td style="text-align: right;">0.106</td>
-<td style="text-align: right;">0.94</td>
-<td style="text-align: right;">0.094</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">subplots, systematic</td>
-<td style="text-align: left;">~1</td>
-<td style="text-align: right;">0.145</td>
+<td style="text-align: left;">constant, ~1</td>
+<td style="text-align: right;">0.147</td>
+<td style="text-align: right;">0.147</td>
+<td style="text-align: right;">-0.120</td>
 <td style="text-align: right;">0.148</td>
-<td style="text-align: right;">2.372</td>
-<td style="text-align: right;">0.115</td>
 <td style="text-align: right;">0.96</td>
-<td style="text-align: right;">0.113</td>
+<td style="text-align: right;">0.157</td>
+<td style="text-align: right;">0.838</td>
+<td style="text-align: right;">0.838</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">subplots, systematic</td>
-<td style="text-align: left;">AIC: ~1 or ~pabove2</td>
-<td style="text-align: right;">0.145</td>
+<td style="text-align: left;">canopy, ~1</td>
 <td style="text-align: right;">0.147</td>
-<td style="text-align: right;">1.226</td>
-<td style="text-align: right;">0.100</td>
-<td style="text-align: right;">0.94</td>
-<td style="text-align: right;">0.106</td>
+<td style="text-align: right;">0.147</td>
+<td style="text-align: right;">0.473</td>
+<td style="text-align: right;">0.160</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">0.163</td>
+<td style="text-align: right;">0.826</td>
+<td style="text-align: right;">0.821</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">subplots, zigzag</td>
-<td style="text-align: left;">~1</td>
-<td style="text-align: right;">0.145</td>
-<td style="text-align: right;">0.145</td>
-<td style="text-align: right;">-0.215</td>
-<td style="text-align: right;">0.095</td>
-<td style="text-align: right;">0.93</td>
-<td style="text-align: right;">0.110</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">subplots, zigzag</td>
-<td style="text-align: left;">AIC: ~1 or ~pabove2</td>
-<td style="text-align: right;">0.145</td>
+<td style="text-align: left;">canopy, AIC</td>
 <td style="text-align: right;">0.147</td>
-<td style="text-align: right;">1.623</td>
-<td style="text-align: right;">0.112</td>
-<td style="text-align: right;">0.92</td>
-<td style="text-align: right;">0.106</td>
+<td style="text-align: right;">0.154</td>
+<td style="text-align: right;">4.780</td>
+<td style="text-align: right;">0.242</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">0.179</td>
+<td style="text-align: right;">0.825</td>
+<td style="text-align: right;">0.815</td>
 </tr>
 </tbody>
 </table>
@@ -666,56 +632,24 @@ Figure&nbsp;2: Distances of detections in one simulated survey, by canopy cover 
 </div>
 <p>How often did AIC choose the canopy model? The <code>Detection</code> results record which candidate model was selected in each repetition.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>canopy_share <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">setNames</span>(sims[<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)], scenarios<span class="sc">$</span>design[<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)]), <span class="cf">function</span>(sim) {</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  selected <span class="ot">&lt;-</span> sim<span class="sc">@</span>results<span class="sc">$</span>Detection[<span class="dv">1</span>, <span class="st">"SelectedModel"</span>, <span class="fu">seq_len</span>(sim<span class="sc">@</span>reps)]</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(selected <span class="sc">==</span> <span class="dv">2</span>) <span class="co"># model 2 is ~pabove2</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>canopy_share</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>selected <span class="ot">&lt;-</span> sims[[<span class="st">"canopy, AIC"</span>]]<span class="sc">@</span>results<span class="sc">$</span>Detection[<span class="dv">1</span>, <span class="st">"SelectedModel"</span>, <span class="fu">seq_len</span>(REPS)]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>canopy_share <span class="ot">&lt;-</span> <span class="fu">mean</span>(selected <span class="sc">==</span> <span class="dv">2</span>) <span class="co"># model 2 is ~pabove2</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>canopy_share</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>whole park, systematic   subplots, systematic       subplots, zigzag 
-                  0.83                   0.72                   0.73 </code></pre>
+<pre><code>[1] 0.43</code></pre>
 </div>
 </div>
-<p>With 100 repetitions, the Monte Carlo standard error of the bias is about one percentage point: the standard deviation of the estimates divided by <span class="math inline">\(\sqrt{100}\)</span>. Differences in bias of a point or two are therefore not meaningful.</p>
-<ul>
-<li><strong>Bias.</strong> The bias ranges from -0.2% to 2.4%. That is small next to the CV of about 10% of a single survey, and no design or analysis stands out.</li>
-<li><strong>Ignoring canopy.</strong> Even when detectability depends on canopy, a detection function without covariates (<code>~1</code>) estimates density as well as one with it. This is pooling robustness at work: the detection function averages over the variation in detectability, and because each design samples canopy conditions in proportion to their extent in the area it estimates for, the average is the right one <span class="citation" data-cites="buckland2001">(<a href="#ref-buckland2001" role="doc-biblioref">Buckland et al. 2001</a>)</span>. Pooling robustness does not protect estimates for parts of the area with different canopy, such as density in dense forest alone <span class="citation" data-cites="rexstad2023">(<a href="#ref-rexstad2023" role="doc-biblioref">Rexstad et al. 2023</a>)</span>.</li>
-<li><strong>Including canopy.</strong> AIC chose the canopy model in 72–83% of repetitions. Including it changes neither the bias nor the RRMSE materially, so for the overall density it does not make the estimate more accurate.</li>
-<li><strong>Precision.</strong> The RRMSE ranges from 0.09 to 0.11. The subplot designs estimate density within the subplots about as precisely as the whole-park design estimates it for the park, with less effort.</li>
-<li><strong>Confidence intervals.</strong> Coverage ranges from 0.92 to 0.96. With 100 repetitions, coverage itself has a Monte Carlo standard error of about 0.02, so this is consistent with the nominal 95% for all designs.</li>
-</ul>
-<p>The estimates from each repetition are stored in <code>sim@results$individuals$D</code>, an array of strata × statistics × repetitions. Its last two slices hold the mean and standard deviation across repetitions, and the last row is the total.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>estimates <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">seq_along</span>(sims), <span class="cf">function</span>(i) {</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  est <span class="ot">&lt;-</span> sims[[i]]<span class="sc">@</span>results<span class="sc">$</span>individuals<span class="sc">$</span>D</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(scenarios[i, ], <span class="at">D =</span> est[<span class="fu">dim</span>(est)[<span class="dv">1</span>], <span class="st">"Estimate"</span>, <span class="fu">seq_len</span>(sims[[i]]<span class="sc">@</span>reps)] <span class="sc">*</span> <span class="fl">1e6</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in data.frame(scenarios[i, ], D = est[dim(est)[1], "Estimate",
-seq_len(sims[[i]]@reps)] * : row names were found from a short variable and
-have been discarded
-Warning in data.frame(scenarios[i, ], D = est[dim(est)[1], "Estimate",
-seq_len(sims[[i]]@reps)] * : row names were found from a short variable and
-have been discarded
-Warning in data.frame(scenarios[i, ], D = est[dim(est)[1], "Estimate",
-seq_len(sims[[i]]@reps)] * : row names were found from a short variable and
-have been discarded
-Warning in data.frame(scenarios[i, ], D = est[dim(est)[1], "Estimate",
-seq_len(sims[[i]]@reps)] * : row names were found from a short variable and
-have been discarded
-Warning in data.frame(scenarios[i, ], D = est[dim(est)[1], "Estimate",
-seq_len(sims[[i]]@reps)] * : row names were found from a short variable and
-have been discarded
-Warning in data.frame(scenarios[i, ], D = est[dim(est)[1], "Estimate",
-seq_len(sims[[i]]@reps)] * : row names were found from a short variable and
-have been discarded</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(estimates, <span class="fu">aes</span>(D, analysis)) <span class="sc">+</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> results, <span class="fu">aes</span>(true_D, analysis), <span class="at">shape =</span> <span class="dv">124</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">colour =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>design, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated density (moose / km²)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>estimates <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(scenarios, <span class="cf">function</span>(sc) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  est <span class="ot">&lt;-</span> sims[[sc]]<span class="sc">@</span>results<span class="sc">$</span>individuals<span class="sc">$</span>D</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">scenario =</span> sc, <span class="at">D =</span> est[<span class="fu">dim</span>(est)[<span class="dv">1</span>], <span class="st">"Estimate"</span>, <span class="fu">seq_len</span>(REPS)] <span class="sc">*</span> <span class="fl">1e6</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>estimates<span class="sc">$</span>scenario <span class="ot">&lt;-</span> <span class="fu">factor</span>(estimates<span class="sc">$</span>scenario, <span class="at">levels =</span> <span class="fu">rev</span>(scenarios))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(estimates, <span class="fu">aes</span>(D, scenario)) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> results, <span class="fu">aes</span>(true_D, scenario), <span class="at">shape =</span> <span class="dv">124</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">colour =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated density (moose / km²)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-results" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -723,27 +657,31 @@ have been discarded</code></pre>
 <img src="simulation-detectability_files/figure-html/fig-results-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Density estimates across repetitions. The red mark is the true density of each simulation.
+Figure&nbsp;3: Density estimates across repetitions. The red mark is the true density.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>With 100 repetitions, the Monte Carlo standard error of the bias is roughly the RRMSE divided by 10, here one to two percentage points, and that of the confidence interval coverage about 0.02.</p>
+<ul>
+<li><strong>Detectability.</strong> The fitted canopy effect is weak (a coefficient of -0.0101 per percentage point of <code>pabove2</code>). Canopy therefore lowers the average detection probability of moose groups only slightly, from 0.84 to 0.83.</li>
+<li><strong>Ignoring canopy.</strong> With canopy-dependent detectability, a detection function without covariates (<code>~1</code>) still estimates overall density with a bias of 0.5% and an RRMSE of 0.16, close to the constant-detectability reference (0.148). This is pooling robustness: the detection function averages over the variation in detectability, and because the design samples canopy conditions in proportion to their extent, the average is the right one.</li>
+<li><strong>Including canopy.</strong> AIC chose the canopy model in 43% of repetitions. Offering it made the estimates worse rather than better: the RRMSE rose to 0.242 and the bias to 4.8%. With an effect this weak, the extra parameter adds variance, and a hazard-rate model with a covariate is harder to fit reliably to a single survey’s data than one without.</li>
+</ul>
 </section>
 <section id="discussion" class="level2">
 <h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
-<p>For moose in Riding Mountain National Park, drone surveys confined to subplots sized for one flight estimate the density within the subplots as accurately as a design across the whole park. They do this with about 13% less transect, and the zigzag spends the largest share of flying time on effort (<a href="../workflow/simulation-design.html"><em>Survey designs with subplots</em></a>). Canopy-dependent detectability, simulated here with the <code>cov.surface</code> argument, did not bias any design. Ignoring canopy in the analysis was also safe for the overall density.</p>
-<p>Two caveats matter when using these results for planning:</p>
-<ul>
-<li><strong>The estimate is for the subplots, not the park.</strong> Here the subplots happen to have almost the same density as the park, but that is not guaranteed. To estimate abundance for the whole park from subplots, the survey data have to be modelled with a DSM, predicting from habitat covariates as in <a href="../workflow/dsm.html"><em>Fitting a density surface model</em></a>.</li>
-<li><strong>The results are specific to this landscape.</strong> The effect of spatially varying detectability depends on how canopy is distributed and where the transects fall. In denser forest, or with subplots placed in unrepresentative habitat, the conclusions could change. Checking that is exactly what <code>cov.surface</code> makes possible.</li>
-</ul>
+<p>For moose in Riding Mountain National Park, the canopy effect estimated from the 10 m lidar is too weak to matter for the overall density. The simpler analysis without the covariate is both unbiased and more precise. That conclusion depends on the size of the effect. In the RMNP paper, the canopy coefficient was more than twice as strong, and in denser forest the loss of detections under canopy would be larger; rerunning this article with a stronger <code>cov.param</code> shows how the conclusions change.</p>
+<p>Pooling robustness also has limits: it does not protect estimates for parts of the area where detectability differs from the average, such as density in dense forest alone. It also requires the design to sample canopy conditions representatively <span class="citation" data-cites="rexstad2023">(<a href="#ref-rexstad2023" role="doc-biblioref">Rexstad et al. 2023</a>)</span>. A design whose transects under-sample dense forest, or estimates reported by habitat, need the canopy covariate in the analysis. Those are the situations where simulating detectability from the canopy raster is most useful, because constant detectability would hide the problem.</p>
+<p>The <a href="../workflow/simulation-multispecies.html">next article</a> combines it with species-specific detectability to simulate a multi-species survey.</p>
 </section>
 <section id="saving" class="level2">
 <h2 class="anchored" data-anchor-id="saving">Saving</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(results, <span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"simulation_results.csv"</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(results, <span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"simulation_detectability.csv"</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p><strong>Next:</strong> <a href="../workflow/simulation-multispecies.html">Simulating a multi-species survey</a>.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -1172,6 +1110,9 @@ Rexstad, Eric, Stephen T. Buckland, Laura Marshall, and David L. Borchers. 2023.
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../workflow/simulation-multispecies.html" class="pagination-link" aria-label="Multi-species survey">
+        <span class="nav-page-text">Multi-species survey</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

@@ -319,6 +319,12 @@ div.csl-indent {
  <span class="menu-text">Spatially varying detectability</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/simulation-multispecies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi-species survey</span></a>
+  </div>
+</li>
       </ul>
   </li>
       </ul>
@@ -378,7 +384,7 @@ div.csl-indent {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This series of articles walks through a complete distance sampling analysis of an aerial survey in R: from raw sightings and flight lines to maps of density and estimates of abundance with their uncertainty. The results are then used to simulate and compare designs for future drone surveys. It uses real data from a 2025 thermal-drone survey of moose, elk, deer, bison and wolves in Riding Mountain National Park, Manitoba.</p>
+<p>This series of articles walks through a complete distance sampling analysis of an aerial survey in R: from raw sightings and flight lines to maps of density and estimates of abundance with their uncertainty. The results are then used to simulate and compare designs for future drone surveys. It uses real data from a 2025 thermal-drone survey of moose, elk, deer, bison and wolves in Riding Mountain National Park, Manitoba, flown by Superwake; their <a href="https://www.superwake.ca/s/RMNP-Report.html">survey report</a> describes the survey and maps the same detections.</p>
 <p>The articles are written in the same style as the <code>dsm</code> and <code>dsims</code> package articles on <a href="https://distancesampling.org">distancesampling.org</a>, and link to them where they cover the general method. They add the steps those examples leave out: turning flight tracks into segments, extracting covariates from raster layers, building a prediction grid, and fitting species-specific models to a multi-species survey following <span class="citation" data-cites="roberts2016">Roberts et al. (<a href="#ref-roberts2016" role="doc-biblioref">2016</a>)</span>.</p>
 </section>
 <section id="the-workflow" class="level2">
@@ -397,7 +403,8 @@ div.csl-indent {
   D --&gt; F["From DSM to simulation&lt;br/&gt;simulation_setup.rds"]
   C --&gt; F
   F --&gt; G["Survey designs with subplots&lt;br/&gt;simulation_designs.rds"]
-  G --&gt; H["Spatially varying detectability&lt;br/&gt;simulation_results.csv"]
+  G --&gt; H["Spatially varying detectability"]
+  G --&gt; I["Multi-species survey"]
 </pre>
 </div>
 <p></p></figure><p></p>
@@ -425,7 +432,7 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td><a href="../workflow/detection-function.html">Estimating the detection function</a></td>
-<td>Fits half-normal and hazard-rate detection functions with species and canopy covariates and selects one by AIC</td>
+<td>Fits half-normal and hazard-rate detection functions with species and canopy covariates, compares them by AIC and selects one</td>
 <td><code>Distance</code></td>
 </tr>
 <tr class="even">
@@ -440,33 +447,38 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td><a href="../workflow/simulation-density.html">From density surface model to simulation</a></td>
-<td>Converts the moose DSM and detection function into the region, density, population and detectability objects of <code>dsims</code></td>
+<td>Converts the DSMs, group sizes and detection function for moose, deer and elk into the region, density, population and detectability objects of <code>dsims</code></td>
 <td><code>dsims</code></td>
 </tr>
 <tr class="odd">
 <td><a href="../workflow/simulation-design.html">Survey designs with subplots</a></td>
-<td>Generates subplots sized for one drone flight, places systematic and zigzag transects inside them, and compares coverage and effort with a design across the whole park</td>
+<td>Sets up the standard Alberta segmented grid of 10 km transects, generates subplots sized for one drone flight with systematic and zigzag transects inside them, compares coverage and effort with a design across the whole park, and simulates all four designs</td>
 <td><code>dsims</code>, <code>dssd</code></td>
 </tr>
 <tr class="even">
-<td><a href="../workflow/simulation-detectability.html">Simulating surveys with spatially varying detectability</a></td>
-<td>Simulates surveys in which detectability depends on canopy cover at each animal, and compares designs and analyses</td>
+<td><a href="../workflow/simulation-detectability.html">Simulating spatially varying detectability</a></td>
+<td>Makes moose detectability depend on the canopy cover at each animal, and tests whether the analysis needs the canopy covariate</td>
 <td><code>dsims</code> (fork)</td>
+</tr>
+<tr class="odd">
+<td><a href="../workflow/simulation-multispecies.html">Simulating a multi-species survey</a></td>
+<td>Simulates moose, deer and elk on the same transects and compares a pooled detection function with separate ones per species</td>
+<td><code>dsims</code> (fork), <code>Distance</code></td>
 </tr>
 </tbody>
 </table>
-<p>The first five articles are the core analysis. The last three use its results to test survey designs by simulation and can be skipped if you only need estimates from your own survey.</p>
+<p>The first five articles are the core analysis. The last four use its results to test survey designs by simulation and can be skipped if you only need estimates from your own survey.</p>
 <p>Each article ends by saving its results to <code>workflow/outputs/</code>, and the next one starts by loading them. You can therefore start at any article, as long as the files from the previous step exist.</p>
 <p><strong>All the code of the five core articles is also available as a single script, <a href="rmnp_workflow.R"><code>rmnp_workflow.R</code></a>.</strong> It includes the data check functions, and it is the easiest starting point for analysing your own survey: replace the file names and column names in the first section, run the checks, and work through the script. The simulation articles are kept separate, because they are only needed when planning a new survey.</p>
 </section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
-<p>Download the example data, <a href="../data/rmnp_example_data.zip"><code>rmnp_example_data.zip</code></a> (22 MB), and unzip it into a <code>data/</code> folder in your project. The <a href="../workflow/data-formatting.html">first article</a> also downloads it automatically if it is missing. The zip contains <code>RMNP/</code>:</p>
+<p>Download the example data, <a href="../data/rmnp_example_data.zip"><code>rmnp_example_data.zip</code></a> (36 MB), and unzip it into a <code>data/</code> folder in your project. The <a href="../workflow/data-formatting.html">first article</a> also downloads it automatically if it is missing. The zip contains <code>RMNP/</code>:</p>
 <ul>
-<li><code>RMNPobservations.csv</code>: sightings with coordinates, species and group size;</li>
+<li><code>RMNPsightings.csv</code>: quality-checked sightings with species, group size, latitude and longitude;</li>
 <li><code>SimpliedFlightTrack.shp</code>: flight lines on effort;</li>
 <li><code>RMNPArea.shp</code>: the study area boundary;</li>
-<li><code>lidar/lidar_pabove2_zmax_30m.tif</code>: lidar canopy cover and canopy height.</li>
+<li><code>lidar/lidar_pabove2_zmax_10m.tif</code>: lidar canopy cover (<code>pabove2</code>, %) and canopy height (<code>zmax</code>, m) at 10 m.</li>
 </ul>
 <p>The code uses <code>here()</code> for file paths, so run it from an RStudio project, or any folder that contains a <code>.here</code> file or a Git repository.</p>
 <p>To use your own data, you need the same four ingredients: sightings with coordinates, species and group size; the lines flown on effort; a study area polygon; and covariate rasters covering the study area.</p>

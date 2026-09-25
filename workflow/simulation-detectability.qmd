@@ -81,7 +81,7 @@ detect_canopy <- make.detectability(
 plot(detect_canopy, pop_descs$Moose)
 ```
 
-The detection function in open areas stays close to 1 across the whole strip, while under the densest canopy it falls to a small fraction at the truncation distance.
+The dashed lines show the range of the covariate effect: detection probability is highest in the open and lowest under the densest canopy. Most of the park lies between these extremes.
 
 ## One simulated survey
 
@@ -111,7 +111,7 @@ ggplot(detections, aes(distance)) +
   theme_minimal()
 ```
 
-Under dense canopy, detections are concentrated near the line; in the open they spread across the whole strip.
+With the weak canopy effect estimated from the 10 m lidar, the distance distributions differ only a little between canopy classes.
 
 ## Simulations
 
@@ -192,16 +192,17 @@ ggplot(estimates, aes(D, scenario)) +
   theme_minimal()
 ```
 
-With `r REPS` repetitions, the Monte Carlo standard error of the bias is about one percentage point, and that of the confidence interval coverage about 0.02.
+With `r REPS` repetitions, the Monte Carlo standard error of the bias is roughly the RRMSE divided by 10, here one to two percentage points, and that of the confidence interval coverage about 0.02.
 
-- **Detectability.** Canopy lowers the average detection probability of moose groups from `r round(results$true_Pa[1], 2)` to `r round(results$true_Pa[2], 2)`, so a survey detects fewer groups and estimates density from less information.
-- **Bias.** The bias ranges from `r round(min(results$bias_pct), 1)`% to `r round(max(results$bias_pct), 1)`%. Even when detectability depends on canopy, a detection function without covariates (`~1`) estimates overall density without meaningful bias. This is pooling robustness: the detection function averages over the variation in detectability, and because the design samples canopy conditions in proportion to their extent, the average is the right one.
-- **Including canopy.** AIC chose the canopy model in `r round(100 * canopy_share)`% of repetitions. It gives a better description of the data, but for the overall density it changes neither the bias nor the RRMSE materially.
-- **Precision.** Canopy increases the RRMSE from `r round(results$rrmse[1], 3)` to `r round(results$rrmse[2], 3)`, because fewer groups are detected.
+- **Detectability.** The fitted canopy effect is weak (a coefficient of `r round(beta_pabove2, 4)` per percentage point of `pabove2`). Canopy therefore lowers the average detection probability of moose groups only slightly, from `r round(results$true_Pa[1], 2)` to `r round(results$true_Pa[2], 2)`.
+- **Ignoring canopy.** With canopy-dependent detectability, a detection function without covariates (`~1`) still estimates overall density with a bias of `r round(results$bias_pct[2], 1)`% and an RRMSE of `r round(results$rrmse[2], 3)`, close to the constant-detectability reference (`r round(results$rrmse[1], 3)`). This is pooling robustness: the detection function averages over the variation in detectability, and because the design samples canopy conditions in proportion to their extent, the average is the right one.
+- **Including canopy.** AIC chose the canopy model in `r round(100 * canopy_share)`% of repetitions. Offering it made the estimates worse rather than better: the RRMSE rose to `r round(results$rrmse[3], 3)` and the bias to `r round(results$bias_pct[3], 1)`%. With an effect this weak, the extra parameter adds variance, and a hazard-rate model with a covariate is harder to fit reliably to a single survey's data than one without.
 
 ## Discussion
 
-For the overall moose density in Riding Mountain National Park, spatially varying detectability matters for precision but not for bias. Pooling robustness has limits, though: it does not protect estimates for parts of the area where detectability differs from the average, such as density in dense forest alone, and it requires the design to sample canopy conditions representatively [@rexstad2023]. A design whose transects under-sample dense forest, or estimates reported by habitat, need the canopy covariate in the analysis. These are the situations where simulating detectability from the canopy raster is most useful, because constant detectability would hide the problem.
+For moose in Riding Mountain National Park, the canopy effect estimated from the 10 m lidar is too weak to matter for the overall density. The simpler analysis without the covariate is both unbiased and more precise. That conclusion depends on the size of the effect. In the RMNP paper, the canopy coefficient was more than twice as strong, and in denser forest the loss of detections under canopy would be larger; rerunning this article with a stronger `cov.param` shows how the conclusions change.
+
+Pooling robustness also has limits: it does not protect estimates for parts of the area where detectability differs from the average, such as density in dense forest alone. It also requires the design to sample canopy conditions representatively [@rexstad2023]. A design whose transects under-sample dense forest, or estimates reported by habitat, need the canopy covariate in the analysis. Those are the situations where simulating detectability from the canopy raster is most useful, because constant detectability would hide the problem.
 
 The [next article](simulation-multispecies.qmd) combines it with species-specific detectability to simulate a multi-species survey.
 

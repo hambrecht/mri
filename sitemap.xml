@@ -1,63 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hambrecht.github.io/mri/workflow/simulation-detectability.html</loc>
-    <lastmod>2026-09-25T02:08:15.973Z</lastmod>
+    <loc>https://hambrecht.github.io/mri/workflow/simulation-multispecies.html</loc>
+    <lastmod>2026-09-25T19:13:13.752Z</lastmod>
   </url>
   <url>
-    <loc>https://hambrecht.github.io/mri/workflow/simulation-density.html</loc>
-    <lastmod>2026-09-25T18:18:24.816Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/workflow/dsm.html</loc>
-    <lastmod>2026-09-24T23:39:02.332Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/workflow/covariates.html</loc>
-    <lastmod>2026-09-25T17:26:11.214Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/workflow/index.html</loc>
-    <lastmod>2026-09-25T00:40:38.816Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/sim_quadcopter.html</loc>
-    <lastmod>2026-09-17T20:08:47.039Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/sim.html</loc>
-    <lastmod>2026-09-17T20:09:03.785Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/index.html</loc>
-    <lastmod>2026-09-25T18:14:44.237Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/guide.html</loc>
-    <lastmod>2026-09-17T20:11:52.180Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/sim_multiplatform.html</loc>
-    <lastmod>2026-09-17T20:08:21.972Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/dl.html</loc>
-    <lastmod>2026-09-17T20:07:54.110Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/workflow/data-formatting.html</loc>
-    <lastmod>2026-09-25T17:33:25.280Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hambrecht.github.io/mri/workflow/detection-function.html</loc>
-    <lastmod>2026-09-25T17:46:10.970Z</lastmod>
+    <loc>https://hambrecht.github.io/mri/workflow/simulation-design.html</loc>
+    <lastmod>2026-09-25T18:35:34.038Z</lastmod>
   </url>
   <url>
     <loc>https://hambrecht.github.io/mri/workflow/abundance.html</loc>
     <lastmod>2026-09-24T23:52:07.405Z</lastmod>
   </url>
   <url>
-    <loc>https://hambrecht.github.io/mri/workflow/simulation-design.html</loc>
-    <lastmod>2026-09-25T18:00:24.021Z</lastmod>
+    <loc>https://hambrecht.github.io/mri/workflow/detection-function.html</loc>
+    <lastmod>2026-09-25T17:46:10.970Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/workflow/data-formatting.html</loc>
+    <lastmod>2026-09-25T17:48:07.578Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/dl.html</loc>
+    <lastmod>2026-09-17T20:07:54.110Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/sim_multiplatform.html</loc>
+    <lastmod>2026-09-17T20:08:21.972Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/guide.html</loc>
+    <lastmod>2026-09-17T20:11:52.180Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/index.html</loc>
+    <lastmod>2026-09-25T18:14:44.237Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/sim.html</loc>
+    <lastmod>2026-09-17T20:09:03.785Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/sim_quadcopter.html</loc>
+    <lastmod>2026-09-17T20:08:47.039Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/workflow/index.html</loc>
+    <lastmod>2026-09-25T18:00:53.896Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/workflow/covariates.html</loc>
+    <lastmod>2026-09-25T17:26:11.214Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/workflow/dsm.html</loc>
+    <lastmod>2026-09-24T23:39:02.332Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/workflow/simulation-density.html</loc>
+    <lastmod>2026-09-25T18:18:24.816Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hambrecht.github.io/mri/workflow/simulation-detectability.html</loc>
+    <lastmod>2026-09-25T19:13:41.222Z</lastmod>
   </url>
 </urlset>

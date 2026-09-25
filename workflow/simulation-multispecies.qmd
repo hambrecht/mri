@@ -224,7 +224,7 @@ separate <- results[results$analysis == "separate", ]
 ```
 
 - **Pooled analysis.** The pooled detection function estimates all three species with a bias between `r round(min(pooled$bias_pct), 1)`% and `r round(max(pooled$bias_pct), 1)`%. Its RRMSE ranges from `r round(min(pooled$rrmse), 2)` to `r round(max(pooled$rrmse), 2)`.
-- **Separate analyses.** With a detection function per species, the RRMSE ranges from `r round(min(separate$rrmse), 2)` to `r round(max(separate$rrmse), 2)`. The difference is largest for elk, the species with the fewest detections, where the separate model has only its own sightings to estimate the shape of the detection function from.
+- **Separate analyses.** With a detection function per species, the RRMSE ranges from `r round(min(separate$rrmse), 2)` to `r round(max(separate$rrmse), 2)`. For moose and deer the two analyses perform similarly. Pooling helps most for elk, the species with the fewest detections, whose separate model has only its own sightings to estimate the shape of the detection function from: RRMSE `r round(pooled$rrmse[pooled$species == "Elk"], 2)` pooled against `r round(separate$rrmse[separate$species == "Elk"], 2)` separate, and bias `r round(pooled$bias_pct[pooled$species == "Elk"], 1)`% against `r round(separate$bias_pct[separate$species == "Elk"], 1)`%.
 - **Confidence intervals.** Coverage ranges from `r round(min(results$ci_coverage), 2)` to `r round(max(results$ci_coverage), 2)`. With `r REPS` repetitions, coverage has a Monte Carlo standard error of about 0.02.
 
 ## Discussion

@@ -316,6 +316,12 @@ div.csl-indent {
  <span class="menu-text">Spatially varying detectability</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/simulation-multispecies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi-species survey</span></a>
+  </div>
+</li>
       </ul>
   </li>
       </ul>
@@ -390,7 +396,7 @@ div.csl-indent {
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>This article is the first step of the <a href="../workflow/index.html">R workflow</a> for analysing aerial surveys of moose and other ungulates with distance sampling. We take the raw survey data, a table of sightings and a set of flight lines, and turn them into the three tables that <code>Distance</code> and <code>dsm</code> expect: detection data, segment data and observation data. The general principles are covered in the <code>dsm</code> article <a href="https://distancesampling.org/dsm/articles/data_format/dsm-data-formatting.html"><em>Data formatting for density surface models</em></a>; here we apply them to a real thermal-drone survey.</p>
-<p>The example data come from an aerial ungulate survey of Riding Mountain National Park (RMNP), Manitoba, in February 2025. The survey was flown by a fixed-wing drone (Superwake SW-117) carrying a gimbal-mounted thermal and RGB camera, along north–south transects spaced 600 m apart (1.6 km in places). Video was recorded continuously. For each detection the aircraft circled the group to count and identify the animals, and the group’s position was obtained by projecting the camera’s view onto a digital elevation model. Moose, elk, white-tailed deer, bison and wolves were recorded.</p>
+<p>The example data come from an aerial ungulate survey of Riding Mountain National Park (RMNP), Manitoba, in February 2025. The survey was flown by a fixed-wing drone (Superwake SW-117) carrying a gimbal-mounted thermal and RGB camera, along north–south transects spaced 600 m apart (1.6 km in places). Video was recorded continuously. For each detection the aircraft circled the group to count and identify the animals, and the group’s position was obtained by projecting the camera’s view onto a digital elevation model. Moose, elk, white-tailed deer, bison and wolves were recorded. The survey and its detections are described in Superwake’s <a href="https://www.superwake.ca/s/RMNP-Report.html">RMNP survey report</a>, which includes a map of the same dataset.</p>
 </section>
 <section id="prerequisites" class="level2">
 <h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
