@@ -1,5 +1,6 @@
 ---
 title: "Moose Research Initiative - Theme 4"
+css: styles.css
 ---
 
 This site is a **best practice guide** for using drones in wildlife surveys, developed as part of the [Moose Research Initiative](https://friresearch.ca/project/moose-research-initiative), Theme 4. It turns our simulation and deep learning research into practical recommendations for choosing a survey platform, designing a flight plan, configuring cameras, and processing imagery.
@@ -18,15 +19,21 @@ The [supporting research](sim.qmd) behind these recommendations — simulation s
 ## Members
 | Name | Photo |
 |:--:|:--:|
-| Nicholas C. Coops | ![](https://irss.sites.olt.ubc.ca/files/2021/06/Nicholas3-scaled.jpg) |
-| Gord Stenhouse | ![](https://friresearch.ca/data/Gord.jpg) |
-| Leonard Hambrecht | ![](https://irss.sites.olt.ubc.ca/files/2025/05/Leonard-Hambrecht-05-25-Website-1-scaled.jpg) |
-| Hiroto Goto | ![](https://irss.sites.olt.ubc.ca/files/2025/05/Hiroto-Goto-05-25-cropped.jpg) |
+| Nicholas C. Coops | ![](https://irss.sites.olt.ubc.ca/files/2021/06/Nicholas3-scaled.jpg){.member-photo} |
+| Gord Stenhouse | ![](https://friresearch.ca/data/Gord.jpg){.member-photo} |
+| Leonard Hambrecht | ![](https://irss.sites.olt.ubc.ca/files/2025/05/Leonard-Hambrecht-05-25-Website-1-scaled.jpg){.member-photo} |
+| Hiroto Goto | ![](https://irss.sites.olt.ubc.ca/files/2025/05/Hiroto-Goto-05-25-cropped.jpg){.member-photo} |
 
 ## Contact
 | Name | Email |
 |:--:|:--:|
 | Leonard Hambrecht | [hambrecht@users.noreply.github.com](mailto:137965368+hambrecht@users.noreply.github.com) |
+
+## Acknowledgements
+
+This work was carried out at the Integrated Remote Sensing Studio (IRSS), University of British Columbia, as part of the Moose Research Initiative with fRI Research and the Government of Alberta. It was funded by the Forest Resource Improvement Association of Alberta (grant FRI-24-08). We thank Kanwar Johal of Superwake, whose team flew the 2025 Riding Mountain National Park survey, for facilitating access to the data and for generous support throughout, including many calls to answer our questions about the survey.
+
+The [R workflow](workflow/index.qmd) builds directly on the case studies and package articles published by the team behind [distancesampling.org](https://distancesampling.org) at the Centre for Research into Ecological and Environmental Modelling (CREEM), University of St Andrews. We thank Laura Marshall for discussing the code contributions to `dsims` and `dssd`. We also thank Stephen Buckland, who with co-authors quite literally wrote the book on distance sampling (Buckland et al. 2001, *Introduction to Distance Sampling*, Oxford University Press).
 
 ## Website
 [IRSS](https://irsslab.forestry.ubc.ca/){target="_blank"}

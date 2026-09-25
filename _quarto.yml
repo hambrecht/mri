@@ -1,6 +1,7 @@
 project:
   type: website
   output-dir: "."
+  pre-render: workflow/R/make_script.R
   render:
     - index.qmd
     - guide.qmd
@@ -8,6 +9,16 @@ project:
     - sim_multiplatform.qmd
     - sim_quadcopter.qmd
     - dl.qmd
+    - workflow/index.qmd
+    - workflow/data-formatting.qmd
+    - workflow/covariates.qmd
+    - workflow/detection-function.qmd
+    - workflow/dsm.qmd
+    - workflow/abundance.qmd
+    - workflow/simulation-density.qmd
+    - workflow/simulation-design.qmd
+    - workflow/simulation-detectability.qmd
+    - workflow/simulation-multispecies.qmd
 
 website:
   title: "Moose Research Initiative — Theme 4"
@@ -53,12 +64,38 @@ website:
             href: sim_quadcopter.qmd
           - text: "Deep Learning"
             href: dl.qmd
+      - section: "R Workflow"
+        href: workflow/index.qmd
+        contents:
+          - text: "Formatting survey data"
+            href: workflow/data-formatting.qmd
+          - text: "Covariates and prediction grid"
+            href: workflow/covariates.qmd
+          - text: "Detection function"
+            href: workflow/detection-function.qmd
+          - text: "Density surface model"
+            href: workflow/dsm.qmd
+          - text: "Abundance and uncertainty"
+            href: workflow/abundance.qmd
+          - section: "Survey simulation"
+            contents:
+              - text: "From DSM to simulation"
+                href: workflow/simulation-density.qmd
+              - text: "Survey designs with subplots"
+                href: workflow/simulation-design.qmd
+              - text: "Spatially varying detectability"
+                href: workflow/simulation-detectability.qmd
+              - text: "Multi-species survey"
+                href: workflow/simulation-multispecies.qmd
 
   page-footer:
     left: "Moose Research Initiative — Theme 4"
     right:
       - icon: github
         href: "https://github.com/hambrecht/mri"
+
+execute:
+  freeze: auto
 
 format:
   html:

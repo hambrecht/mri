@@ -1,0 +1,239 @@
+---
+title: "Simulating a multi-species survey"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+The RMNP survey recorded moose, deer, elk, bison and wolves on the same flights. The analysis used one detection function for all species, with species as a covariate [@marques2007]. Pooling lets species with few sightings borrow information about the shape of the detection function from the others. Species still differ in how far away they can be seen, and canopy cover affects all of them.
+
+`dsims` simulates one population at a time. There is no multi-species simulation, but its building blocks can be combined into one:
+
+1. generate one population per species, each with its own density surface, group size and detectability;
+2. combine them into a single population and survey it with one set of transects;
+3. analyse the simulated survey as we analysed the real one: fit the pooled detection function, then estimate abundance by species.
+
+Repeating these steps many times shows how well a design estimates each species. Here we simulate the segmented grid design for moose, deer and elk, and compare the pooled analysis with a separate detection function per species.
+
+## Prerequisites
+
+The simulation needs the [fork of `dsims`](https://github.com/hambrecht/dsims) for the canopy covariate (see [Packages](index.qmd#packages)):
+
+```r
+remotes::install_github(c("hambrecht/dssd", "hambrecht/dsims"))
+```
+
+```{r}
+#| label: packages
+#| message: false
+library(here)
+library(dsims)
+library(Distance)
+library(terra)
+library(ggplot2)
+library(parallel)
+```
+
+We load the region, populations and detection function parameters from [*From density surface model to simulation*](simulation-density.qmd), and the segmented grid design from [*Survey designs with subplots*](simulation-design.qmd).
+
+```{r}
+#| label: load
+list2env(readRDS(here("workflow", "outputs", "simulation_setup.rds")), envir = environment())
+design_seg <- readRDS(here("workflow", "outputs", "simulation_designs.rds"))$design_seg
+```
+
+## Species populations and detectability
+
+The three populations were set up in [*From density surface model to simulation*](simulation-density.qmd): each has the density surface of its DSM, and groups with the observed mean group size.
+
+```{r}
+#| label: populations
+data.frame(animals = round(N_animals), mean_group_size = round(group_size, 2),
+           groups = sapply(pop_descs, function(p) p@N))
+```
+
+Each species gets its own detectability, from the pooled detection function of the RMNP analysis. The hazard-rate shape and the canopy coefficient are shared; the scale differs by species. As in [*Simulating spatially varying detectability*](simulation-detectability.qmd), canopy cover enters through the lidar raster.
+
+```{r}
+#| label: detectability
+lidar <- rast(here("data", "RMNP", "lidar", "lidar_pabove2_zmax_10m.tif"))
+canopy_file <- here("workflow", "outputs", "pabove2_10m.tif")
+writeRaster(lidar[[1]], canopy_file, overwrite = TRUE, names = "pabove2")
+
+detects <- lapply(SIM_SPECIES, function(s) {
+  make.detectability(key.function = "hr", scale.param = scale_species[[s]], shape.param = shape,
+                     cov.param = list(pabove2 = beta_pabove2),
+                     cov.surface = list(pabove2 = canopy_file), truncation = TRUNCATION_M)
+})
+names(detects) <- SIM_SPECIES
+```
+
+```{r}
+#| label: fig-detection-species
+#| fig-cap: "Detection functions for the three species at the median canopy cover of the park."
+g_hr <- function(x, sigma, b) 1 - exp(-(x / sigma)^(-b))
+z <- median(values(lidar[[1]]), na.rm = TRUE)
+curves <- expand.grid(distance = seq(1, TRUNCATION_M, length.out = 200), species = SIM_SPECIES)
+curves$p <- g_hr(curves$distance, scale_species[as.character(curves$species)] * exp(beta_pabove2 * z), shape)
+ggplot(curves, aes(distance, p, colour = species)) +
+  geom_line(linewidth = 1) +
+  labs(x = "Distance (m)", y = "Detection probability", colour = NULL) +
+  theme_minimal()
+```
+
+## One multi-species survey
+
+`survey_once()` carries out the three steps for one repetition. `generate.population()` places each species' groups and computes each group's detection scale from its species and the canopy at its location. We add a `Species` column and stack the three populations. `run.survey()` then surveys the combined population with one set of transects: a `Survey.LT` object built directly from the population and the transects.
+
+```{r}
+#| label: survey-once
+survey_once <- function() {
+  transects <- generate.transects(design_seg)
+  pops <- lapply(SIM_SPECIES, function(s) {
+    p <- suppressWarnings(generate.population(pop_descs[[s]], detects[[s]], region))
+    p@population$Species <- s
+    p
+  })
+  pop <- pops[[1]]
+  pop@population <- do.call(rbind, lapply(pops, function(p) p@population))
+  pop@population$individual <- seq_len(nrow(pop@population))
+  pop@N <- sum(sapply(pops, function(p) p@N))
+
+  survey <- new("Survey.LT", population = pop, transect = transects, perp.truncation = TRUNCATION_M)
+  data <- run.survey(survey, region)@dist.data
+  data$Effort <- as.numeric(data$Effort) # plain numbers for Distance
+  data$Area <- as.numeric(data$Area)
+  truth <- sapply(pops, function(p) sum(p@population$size))
+  list(data = data, truth = setNames(truth, SIM_SPECIES))
+}
+
+set.seed(2025)
+one <- survey_once()
+one$truth
+table(one$data$Species)
+```
+
+The survey data contain one row per detected group, with its distance, group size, species and canopy cover, and one row for each transect without detections. This is the "flat file" format that `Distance` uses.
+
+## Analysing the survey
+
+The pooled analysis follows the RMNP analysis: one hazard-rate detection function with species and canopy cover, and abundance by species with `dht2()`. `stratification = "object"` tells `dht2()` that species is a property of the detected groups rather than of the area, so each species gets its own estimate from the same transects.
+
+```{r}
+#| label: analyse-pooled
+analyse_pooled <- function(data) {
+  data$Species <- factor(data$Species, levels = SIM_SPECIES)
+  fit <- ds(data[!is.na(data$distance), ], truncation = TRUNCATION_M, key = "hr",
+            formula = ~Species + pabove2, adjustment = NULL, quiet = TRUE)
+  est <- dht2(fit, flatfile = data, strat_formula = ~Species,
+              stratification = "object", convert_units = 1)
+  est <- as.data.frame(est)[match(SIM_SPECIES, est$Species), ]
+  data.frame(species = SIM_SPECIES, N = est$Abundance, cv = est$Abundance_CV,
+             lcl = est$LCI, ucl = est$UCI)
+}
+analyse_pooled(one$data)
+```
+
+For comparison, `analyse_separate()` fits a detection function to each species on its own, as if the species had been surveyed separately. It keeps that species' detections and one empty row for every transect on which it was not seen, and fits a hazard-rate model without covariates.
+
+```{r}
+#| label: analyse-separate
+analyse_separate <- function(data) {
+  do.call(rbind, lapply(SIM_SPECIES, function(s) {
+    own <- data[!is.na(data$Species) & data$Species == s, ]
+    empty <- data[match(setdiff(unique(data$Sample.Label), own$Sample.Label), data$Sample.Label), ]
+    empty[, c("object", "distance", "size", "Species", "pabove2")] <- NA
+    flat <- rbind(own, empty)
+    est <- tryCatch({
+      fit <- ds(own, truncation = TRUNCATION_M, key = "hr", adjustment = NULL, quiet = TRUE)
+      as.data.frame(dht2(fit, flatfile = flat, strat_formula = ~1, convert_units = 1))
+    }, error = function(e) NULL)
+    if (is.null(est)) return(data.frame(species = s, N = NA, cv = NA, lcl = NA, ucl = NA))
+    data.frame(species = s, N = est$Abundance, cv = est$Abundance_CV, lcl = est$LCI, ucl = est$UCI)
+  }))
+}
+analyse_separate(one$data)
+```
+
+## Running the simulation
+
+Each repetition takes about 20 seconds, most of it fitting detection functions, so we run the repetitions in parallel with the `parallel` package. On Linux and macOS the workers are forked from the running session (see [*Running simulations on Linux*](simulation-density.qmd#running-simulations-on-linux)); on Windows they are separate R sessions, so `clusterEvalQ()` and `clusterExport()` load the packages and copy the objects they need. `clusterSetRNGStream()` gives every worker its own reproducible stream of random numbers.
+
+```{r}
+#| label: simulate
+#| cache: true
+REPS <- 100
+one_rep <- function(i) {
+  s <- survey_once()
+  rbind(cbind(analysis = "pooled", analyse_pooled(s$data), truth = s$truth),
+        cbind(analysis = "separate", analyse_separate(s$data), truth = s$truth))
+}
+
+# Forked workers on Linux and macOS share the session; Windows needs sockets
+cl <- makeCluster(min(detectCores() - 1, 20),
+                  type = if (.Platform$OS.type == "unix") "FORK" else "PSOCK")
+clusterSetRNGStream(cl, 2025)
+invisible(clusterEvalQ(cl, { library(dsims); library(Distance) }))
+clusterExport(cl, c("survey_once", "analyse_pooled", "analyse_separate", "design_seg",
+                    "pop_descs", "detects", "region", "SIM_SPECIES", "TRUNCATION_M"))
+reps <- parLapply(cl, seq_len(REPS), one_rep)
+stopCluster(cl)
+
+reps <- do.call(rbind, Map(cbind, rep = seq_len(REPS), reps))
+```
+
+## Results
+
+For each species and analysis we compare the estimates with the true abundance of the repetition. Group sizes are random, so the true number of animals varies a little between repetitions.
+
+```{r}
+#| label: results
+reps$error <- reps$N - reps$truth
+results <- do.call(rbind, lapply(split(reps, list(reps$species, reps$analysis)), function(r) {
+  data.frame(species = r$species[1], analysis = r$analysis[1],
+             true_N = mean(r$truth), mean_N = mean(r$N, na.rm = TRUE),
+             bias_pct = 100 * mean(r$error / r$truth, na.rm = TRUE),
+             rrmse = sqrt(mean(r$error^2, na.rm = TRUE)) / mean(r$truth),
+             ci_coverage = mean(r$lcl <= r$truth & r$truth <= r$ucl, na.rm = TRUE),
+             mean_cv = mean(r$cv, na.rm = TRUE), failed = sum(is.na(r$N)))
+}))
+results$species <- factor(results$species, levels = SIM_SPECIES)
+results <- results[order(results$species, results$analysis), ]
+rownames(results) <- NULL
+knitr::kable(results, digits = 3)
+```
+
+```{r}
+#| label: fig-results
+#| fig-cap: "Abundance estimates relative to the true abundance, by species and analysis. Values above 1 are overestimates."
+reps$species <- factor(reps$species, levels = SIM_SPECIES)
+ggplot(reps, aes(N / truth, analysis)) +
+  geom_boxplot() +
+  geom_vline(xintercept = 1, colour = "red") +
+  facet_wrap(~species, ncol = 1) +
+  labs(x = "Estimated / true abundance", y = NULL) +
+  theme_minimal()
+```
+
+```{r}
+#| label: summary-numbers
+pooled <- results[results$analysis == "pooled", ]
+separate <- results[results$analysis == "separate", ]
+```
+
+- **Pooled analysis.** The pooled detection function estimates all three species with a bias between `r round(min(pooled$bias_pct), 1)`% and `r round(max(pooled$bias_pct), 1)`%. Its RRMSE ranges from `r round(min(pooled$rrmse), 2)` to `r round(max(pooled$rrmse), 2)`.
+- **Separate analyses.** With a detection function per species, the RRMSE ranges from `r round(min(separate$rrmse), 2)` to `r round(max(separate$rrmse), 2)`. The difference is largest for elk, the species with the fewest detections, where the separate model has only its own sightings to estimate the shape of the detection function from.
+- **Confidence intervals.** Coverage ranges from `r round(min(results$ci_coverage), 2)` to `r round(max(results$ci_coverage), 2)`. With `r REPS` repetitions, coverage has a Monte Carlo standard error of about 0.02.
+
+## Discussion
+
+A multi-species simulation reproduces the logic of the real analysis. All species are detected on the same transects, and the pooled detection function borrows strength across species while keeping their differences in detectability. This makes it possible to check a design for every species of interest at once, including those seen too rarely to plan for on their own. It can also show which species limits the precision of a proposed design.
+
+Two simplifications are worth noting. The species are simulated independently, so the simulation ignores any tendency of species to occur together or to avoid each other. Elk also have an intercept-only DSM, so their simulated groups are spread evenly over the park rather than following their habitat.
+
+## References
+
+::: {#refs}
+:::

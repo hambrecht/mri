@@ -1,0 +1,8 @@
+/* Member photos on the home page: half size, round */
+.member-photo {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}

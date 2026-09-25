@@ -1,0 +1,231 @@
+---
+title: "From density surface model to simulation"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+Simulation lets us test a survey design before flying it: we generate many populations of animals, survey each one with the design, analyse the simulated data and compare the estimates with the true values. The [`dsims`](https://distancesampling.org/dsims/) package does this. It builds a simulation from a region, a population, a detection process, a survey design and an analysis. Its article [*Getting started*](https://distancesampling.org/dsims/articles/GettingStarted.html) introduces these components with an invented density surface made of hotspots.
+
+For a realistic test, the simulated animals should be distributed like the real ones and detected like the real ones. In this article we turn the results of the analysis into the objects that `dsims` expects: the density surface models from [*Fitting a density surface model*](dsm.qmd), the group sizes, and the detection function from [*Estimating the detection function*](detection-function.qmd). We do this for moose, deer and elk, the three species with enough sightings. The conversion from a DSM to a `dsims` density is not covered in the `dsims` documentation.
+
+### Running simulations on Linux
+
+The simulation articles run on any operating system with the repetitions set as shown. If you are an advanced user who wants to run many different simulations, or many more repetitions, consider running them on Linux, or on Windows through the [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/). On Linux, R can start parallel workers by forking the running session, so they share its loaded packages and data instead of each starting a fresh R session and receiving its own copy, as on Windows. Parallel simulations therefore start faster and use less memory. Windows remains perfectly usable for following these articles, but it is not the platform of choice for heavy simulation work.
+
+## Prerequisites
+
+```{r}
+#| label: packages
+#| message: false
+library(here)
+library(dsims) # simulation (loads dssd for designs)
+library(dsm)
+library(Distance)
+library(sf)
+library(terra)
+library(exactextractr)
+library(ggplot2)
+```
+
+The simulation articles use forks of `dsims` and `dssd` (see [Packages](index.qmd#packages)). This article runs with the CRAN versions as well, but [*Simulating spatially varying detectability*](simulation-detectability.qmd) and [*Simulating a multi-species survey*](simulation-multispecies.qmd) need the `dsims` fork:
+
+```r
+remotes::install_github(c("hambrecht/dssd", "hambrecht/dsims"))
+```
+
+We load the data and prediction grid from [*Adding covariates and building a prediction grid*](covariates.qmd), the per-species DSMs from [*Fitting a density surface model*](dsm.qmd), and the detection function from [*Estimating the detection function*](detection-function.qmd).
+
+```{r}
+#| label: load
+model_data <- readRDS(here("workflow", "outputs", "model_data.rds"))
+list2env(model_data, envir = environment())
+dsm_species <- readRDS(here("workflow", "outputs", "dsm_models.rds"))$dsm_species
+df_best <- readRDS(here("workflow", "outputs", "detection_function.rds"))
+
+SIM_SPECIES <- c("Moose", "Deer", "Elk")
+```
+
+## Setting up the region
+
+The region is the study area polygon. It must be in the same projected coordinate system as the data the DSMs were fitted to, because the density grid below takes its `x` and `y` coordinates from the region. With `units = "m"`, all lengths are in metres and areas in square metres.
+
+```{r}
+#| label: region
+region <- make.region(region.name = "RMNP", shape = area, units = "m")
+region@area / 1e6 # km2
+```
+
+## From density surface model to density grid
+
+### The density grid
+
+`make.density()` lays a grid over the region. We use the same 500 m spacing as the prediction grid in the DSM articles.
+
+```{r}
+#| label: density-grid
+#| warning: false
+density <- make.density(region = region, x.space = CELL_SIZE_M)
+cells <- density@density.surface[[1]]
+head(cells, 3)
+```
+
+The grid is stored in the `density.surface` slot, one `sf` table per stratum. Each row is a grid cell with its centre (`x`, `y`) and a `density` column that is 1 everywhere by default. The cells along the boundary are clipped to the region, so not every cell covers the full 500 × 500 m.
+
+```{r}
+#| label: cell-area
+cells$area <- as.numeric(st_area(cells))
+summary(cells$area)
+```
+
+### Covariates for the grid
+
+A habitat DSM needs its covariates to make a prediction, so we extract them for each cell of the `dsims` grid, exactly as we did for the prediction grid. A few cells lie outside the lidar coverage. We give them the median value from the surveyed segments, as the original RMNP analysis did for segments with missing values.
+
+```{r}
+#| label: grid-covariates
+lidar <- rast(here("data", "RMNP", "lidar", "lidar_pabove2_zmax_10m.tif"))
+names(lidar) <- c("pabove2", "zmax")
+
+cell_covs <- exact_extract(lidar, cells, fun = "mean", progress = FALSE)
+names(cell_covs) <- names(lidar)
+sum(!complete.cases(cell_covs))
+for (v in names(cell_covs)) cell_covs[[v]][is.na(cell_covs[[v]])] <- median(segs[[v]])
+
+newdata <- data.frame(x = cells$x, y = cells$y, cell_covs, area = cells$area)
+```
+
+### Predicting a DSM onto the grid
+
+`predict()` gives the expected number of animals in each cell. The offset is each cell's own area; using the nominal cell size instead would overestimate abundance in the clipped cells along the boundary. `dsims` reads the `density` column as animals per unit area, here per square metre, so we divide by the cell area before writing the prediction into the grid.
+
+```{r}
+#| label: dsm-to-density
+dsm_to_density <- function(model, density, newdata) {
+  N_cell <- predict(model, newdata, off.set = newdata$area)
+  density@density.surface[[1]]$density <- as.numeric(N_cell) / newdata$area
+  density
+}
+
+densities <- lapply(dsm_species[SIM_SPECIES], dsm_to_density, density = density, newdata = newdata)
+N_animals <- sapply(densities, function(d) sum(d@density.surface[[1]]$density * newdata$area))
+round(N_animals)
+```
+
+This is the key step. Any model that predicts animals per cell can be converted this way: a DSM with habitat covariates, a spatial smooth, or a model fitted to a previous survey. `make.density()` can also take a fitted GAM through its `fitted.model` argument, as in the *Getting started* article. That only works for models of `x` and `y` alone, though; it cannot supply habitat covariates or a cell-specific offset.
+
+```{r}
+#| label: fig-densities
+#| fig-cap: "Density surfaces used for the simulations (animals per km²). Elk have an intercept-only model, so their density is uniform."
+#| fig-width: 10
+#| fig-height: 8
+maps <- do.call(rbind, lapply(SIM_SPECIES, function(s) {
+  surf <- densities[[s]]@density.surface[[1]]
+  st_sf(species = s, D = surf$density * 1e6, geometry = st_geometry(surf))
+}))
+ggplot(maps) +
+  geom_sf(aes(fill = D), colour = NA) +
+  facet_wrap(~species, ncol = 1) +
+  scale_fill_viridis_c(name = "Animals / km²") +
+  theme_minimal()
+```
+
+The uniform band along the eastern edge of the moose and deer maps is the area without lidar data, where every cell has the median covariate values and therefore the same density.
+
+## Defining the populations
+
+Aerial surveys detect groups rather than individuals: a group of five elk is one detection. We therefore simulate groups, with sizes drawn from a zero-truncated Poisson distribution whose mean is the observed mean group size of each species.
+
+```{r}
+#| label: group-size
+seen <- dist[dist$size > 0 & dist$Species %in% SIM_SPECIES, ]
+group_size <- tapply(seen$size, seen$Species, mean)[SIM_SPECIES]
+round(group_size, 2)
+```
+
+When a population has a `size` covariate, `N` in `make.population.description()` is the number of groups, so we divide the DSM abundance by the mean group size. `fixed.N = TRUE` gives every simulated population exactly that many groups, placed in proportion to the density grid.
+
+```{r}
+#| label: populations
+N_groups <- round(N_animals / group_size)
+pop_descs <- lapply(SIM_SPECIES, function(s) {
+  make.population.description(
+    region = region, density = densities[[s]],
+    covariates = list(size = list(distribution = "ztruncpois", mean = group_size[[s]])),
+    N = N_groups[[s]], fixed.N = TRUE
+  )
+})
+names(pop_descs) <- SIM_SPECIES
+data.frame(animals = round(N_animals), mean_group_size = round(group_size, 2), groups = N_groups)
+```
+
+## Defining detectability
+
+The detection process comes from the fitted detection function: a hazard-rate key whose scale depends on species and canopy cover. `Distance` reports the scale coefficients on the log scale, with moose as the reference level; `make.detectability()` expects the scale and shape on the natural scale. The scale for each species at zero canopy cover is therefore $\exp(\beta_0 + \beta_\text{species})$.
+
+```{r}
+#| label: detection-parameters
+coefs <- summary(df_best)$ds$coeff
+beta <- setNames(coefs$key.scale$estimate, rownames(coefs$key.scale))
+scale_species <- exp(beta["(Intercept)"] + c(Moose = 0, beta[paste0("Species", SIM_SPECIES[-1])]))
+names(scale_species) <- SIM_SPECIES
+shape <- exp(coefs$key.shape["(Intercept)", "estimate"])
+beta_pabove2 <- beta[["pabove2"]]
+round(c(scale_species, shape = shape, beta_pabove2 = beta_pabove2), 4)
+```
+
+These are the parameters of the pooled detection function in the RMNP analysis: hazard-rate, with species and lidar canopy cover as covariates.
+
+For the design comparison in the next article we use a single, constant detection function for moose, evaluated at the median canopy cover of the moose sightings. The later articles use the canopy covariate in full.
+
+```{r}
+#| label: detectability-constant
+pabove2_median <- median(dist$pabove2[dist$Species == "Moose"])
+detect_constant <- make.detectability(
+  key.function = "hr",
+  scale.param = scale_species[["Moose"]] * exp(beta_pabove2 * pabove2_median),
+  shape.param = shape,
+  truncation = TRUNCATION_M
+)
+```
+
+```{r}
+#| label: fig-detectability
+#| fig-cap: "Moose detection function used in the design comparison, at the median canopy cover of moose sightings."
+plot(detect_constant, pop_descs$Moose)
+```
+
+## Checking the population
+
+Generating one population and plotting it is a quick visual check that groups are placed where the DSM predicts them.
+
+```{r}
+#| label: fig-population
+#| fig-cap: "One simulated population of moose groups."
+set.seed(2025)
+pop <- generate.population(pop_descs$Moose, detect_constant, region)
+plot(pop, region)
+```
+
+## Saving
+
+```{r}
+#| label: save
+saveRDS(
+  list(region = region, density = density, densities = densities, pop_descs = pop_descs,
+       N_animals = N_animals, group_size = group_size, detect_constant = detect_constant,
+       scale_species = scale_species, shape = shape, beta_pabove2 = beta_pabove2,
+       SIM_SPECIES = SIM_SPECIES, TRUNCATION_M = TRUNCATION_M,
+       effort = sum(segs$Effort), LOCAL = LOCAL),
+  here("workflow", "outputs", "simulation_setup.rds")
+)
+```
+
+**Next:** [Survey designs with subplots](simulation-design.qmd).
+
+## References
+
+::: {#refs}
+:::

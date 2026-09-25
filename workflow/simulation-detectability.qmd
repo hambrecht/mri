@@ -1,0 +1,220 @@
+---
+title: "Simulating spatially varying detectability"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+In the RMNP survey, animals were harder to detect under dense canopy: the [detection function](detection-function.qmd) with lidar canopy cover (`pabove2`) was clearly better supported than one without it. Detectability therefore varies across the landscape with the forest, and so does the proportion of animals a survey misses.
+
+Simulations normally draw detectability from a fixed detection function, or from individual covariates such as group size that are unrelated to location. The [fork of `dsims`](https://github.com/hambrecht/dsims) adds *spatial* covariates: `make.detectability()` takes a raster through the new `cov.surface` argument, and at every repetition reads the raster at each simulated animal's location. The scale parameter of animal $i$ is then
+
+$$\log(\sigma_i) = \log(\sigma_0) + \beta z_i,$$
+
+where $z_i$ is the raster value at the animal, $\beta$ the coefficient given in `cov.param`, and $\sigma_0$ the scale parameter. This is the same log-linear form that `Distance` uses for covariates, so the fitted coefficients can be used directly. This article is the first documentation of the feature.
+
+The survey design is fixed throughout: the segmented grid of 10 km north–south transects that is the standard design for aerial ungulate surveys in Alberta (see [*Survey designs with subplots*](simulation-design.qmd#a-segmented-grid-design)). Only detectability and the analysis change. We simulate the moose survey three times: with constant detectability, and with canopy-dependent detectability analysed with and without the canopy covariate. This shows what the covariate changes in the simulated data and whether the analysis has to account for it.
+
+## Prerequisites
+
+`cov.surface` exists only in the fork of `dsims`:
+
+```r
+remotes::install_github(c("hambrecht/dssd", "hambrecht/dsims"))
+```
+
+```{r}
+#| label: packages
+#| message: false
+library(here)
+library(dsims)
+library(sf)
+library(terra)
+library(ggplot2)
+stopifnot("cov.surface" %in% names(formals(make.detectability)))
+```
+
+We load the region, populations and detection function parameters from [*From density surface model to simulation*](simulation-density.qmd), and the segmented grid design from [*Survey designs with subplots*](simulation-design.qmd).
+
+```{r}
+#| label: load
+list2env(readRDS(here("workflow", "outputs", "simulation_setup.rds")), envir = environment())
+design_seg <- readRDS(here("workflow", "outputs", "simulation_designs.rds"))$design_seg
+```
+
+## The covariate surface
+
+`cov.surface` takes a single-layer raster, read at the animals' `x` and `y` coordinates, so it must be in the same CRS as the region. We write the canopy cover layer to its own GeoTIFF. A file path is better than an in-memory raster for parallel runs, because each worker then reads the file itself instead of receiving a copy of the raster.
+
+```{r}
+#| label: surface
+lidar <- rast(here("data", "RMNP", "lidar", "lidar_pabove2_zmax_10m.tif"))
+stopifnot(same.crs(lidar, region@region))
+canopy_file <- here("workflow", "outputs", "pabove2_10m.tif")
+writeRaster(lidar[[1]], canopy_file, overwrite = TRUE, names = "pabove2")
+```
+
+Animals outside the raster, here in the part of the park without lidar data, get the raster mean, and `dsims` warns when this happens.
+
+## Detectability that depends on canopy
+
+We use the fitted hazard-rate detection function for moose: the scale parameter at zero canopy cover, the shape parameter, and the canopy coefficient. The name of the entry in `cov.surface` must match the name in `cov.param`.
+
+```{r}
+#| label: detectability
+detect_canopy <- make.detectability(
+  key.function = "hr",
+  scale.param = scale_species[["Moose"]],
+  shape.param = shape,
+  cov.param = list(pabove2 = beta_pabove2),
+  cov.surface = list(pabove2 = canopy_file),
+  truncation = TRUNCATION_M
+)
+```
+
+```{r}
+#| label: fig-detectability
+#| fig-cap: "Moose detection function at the mean canopy cover of the raster (solid), and at the canopy values that bound 95% of the raster (dashed)."
+#| warning: false
+plot(detect_canopy, pop_descs$Moose)
+```
+
+The detection function in open areas stays close to 1 across the whole strip, while under the densest canopy it falls to a small fraction at the truncation distance.
+
+## One simulated survey
+
+A single simulated survey shows the covariate at work. The canopy value at each detected group is carried into the survey data, where the analysis can use it.
+
+```{r}
+#| label: one-survey
+#| warning: false
+set.seed(2025)
+sim_one <- make.simulation(reps = 1, design = design_seg, population.description = pop_descs$Moose,
+                           detectability = detect_canopy,
+                           ds.analysis = make.ds.analysis(dfmodel = ~1, key = "hr", truncation = TRUNCATION_M))
+survey <- run.survey(sim_one)
+detections <- survey@dist.data[!is.na(survey@dist.data$object), ]
+nrow(detections)
+```
+
+```{r}
+#| label: fig-one-survey
+#| fig-cap: "Distances of detected moose groups in one simulated survey, by canopy cover at the group."
+detections$canopy <- cut(detections$pabove2, c(-Inf, 20, 30, Inf),
+                         labels = c("pabove2 < 20%", "20-30%", "> 30%"))
+ggplot(detections, aes(distance)) +
+  geom_histogram(binwidth = 25, boundary = 0) +
+  facet_wrap(~canopy) +
+  labs(x = "Distance (m)", y = "Detections") +
+  theme_minimal()
+```
+
+Under dense canopy, detections are concentrated near the line; in the open they spread across the whole strip.
+
+## Simulations
+
+We run three simulations of the segmented grid design, each with 100 repetitions:
+
+- **constant**: the constant detection function from [*From density surface model to simulation*](simulation-density.qmd#defining-detectability), analysed without covariates (`~1`). This is the reference.
+- **canopy, `~1`**: canopy-dependent detectability, analysed without covariates. The analysis relies on *pooling robustness*: a detection function without covariates can still estimate density without bias when detectability varies between animals [@buckland2001].
+- **canopy, AIC**: canopy-dependent detectability, with AIC choosing between `~1` and `~pabove2`, as in the real analysis.
+
+```{r}
+#| label: analyses
+analysis_null <- make.ds.analysis(dfmodel = ~1, key = "hr", truncation = TRUNCATION_M)
+analysis_canopy <- make.ds.analysis(dfmodel = list(~1, ~pabove2), key = c("hr", "hr"),
+                                    truncation = TRUNCATION_M, criteria = "AIC")
+```
+
+```{r}
+#| label: simulations
+#| cache: true
+#| warning: false
+REPS <- 100
+set.seed(2025)
+run <- function(detect, analysis) {
+  sim <- make.simulation(reps = REPS, design = design_seg, population.description = pop_descs$Moose,
+                         detectability = detect, ds.analysis = analysis)
+  run.simulation(sim, run.parallel = TRUE)
+}
+scenarios <- c("constant, ~1", "canopy, ~1", "canopy, AIC")
+sims <- list(
+  run(detect_constant, analysis_null),
+  run(detect_canopy, analysis_null),
+  run(detect_canopy, analysis_canopy)
+)
+names(sims) <- scenarios
+```
+
+## Results
+
+For each simulation we extract the density of individuals (true and mean estimate, animals per km²), the bias, the root mean squared error relative to the true density (RRMSE), the proportion of 95% confidence intervals containing the true density, and the mean coefficient of variation. We also compare the true average detection probability of the groups in the covered area ($P_a$) with its estimate.
+
+```{r}
+#| label: results
+sim_metrics <- function(sim) {
+  s <- summary(sim, description.summary = FALSE)
+  D <- s@individuals$D[nrow(s@individuals$D), ]
+  det <- s@detection
+  data.frame(true_D = D$Truth * 1e6, mean_D = D$mean.Estimate * 1e6,
+             bias_pct = D$percent.bias, rrmse = D$RMSE / D$Truth,
+             ci_coverage = D$CI.coverage.prob, mean_cv = D$mean.se / D$mean.Estimate,
+             true_Pa = det$mean.observed.Pa[nrow(det)], est_Pa = det$mean.estimate.Pa[nrow(det)])
+}
+results <- cbind(scenario = scenarios, do.call(rbind, lapply(sims, sim_metrics)))
+rownames(results) <- NULL
+knitr::kable(results, digits = 3)
+```
+
+How often did AIC choose the canopy model? The `Detection` results record which candidate model was selected in each repetition.
+
+```{r}
+#| label: selection
+selected <- sims[["canopy, AIC"]]@results$Detection[1, "SelectedModel", seq_len(REPS)]
+canopy_share <- mean(selected == 2) # model 2 is ~pabove2
+canopy_share
+```
+
+```{r}
+#| label: fig-results
+#| fig-cap: "Density estimates across repetitions. The red mark is the true density."
+estimates <- do.call(rbind, lapply(scenarios, function(sc) {
+  est <- sims[[sc]]@results$individuals$D
+  data.frame(scenario = sc, D = est[dim(est)[1], "Estimate", seq_len(REPS)] * 1e6)
+}))
+estimates$scenario <- factor(estimates$scenario, levels = rev(scenarios))
+ggplot(estimates, aes(D, scenario)) +
+  geom_boxplot() +
+  geom_point(data = results, aes(true_D, scenario), shape = 124, size = 6, colour = "red") +
+  labs(x = "Estimated density (moose / km²)", y = NULL) +
+  theme_minimal()
+```
+
+With `r REPS` repetitions, the Monte Carlo standard error of the bias is about one percentage point, and that of the confidence interval coverage about 0.02.
+
+- **Detectability.** Canopy lowers the average detection probability of moose groups from `r round(results$true_Pa[1], 2)` to `r round(results$true_Pa[2], 2)`, so a survey detects fewer groups and estimates density from less information.
+- **Bias.** The bias ranges from `r round(min(results$bias_pct), 1)`% to `r round(max(results$bias_pct), 1)`%. Even when detectability depends on canopy, a detection function without covariates (`~1`) estimates overall density without meaningful bias. This is pooling robustness: the detection function averages over the variation in detectability, and because the design samples canopy conditions in proportion to their extent, the average is the right one.
+- **Including canopy.** AIC chose the canopy model in `r round(100 * canopy_share)`% of repetitions. It gives a better description of the data, but for the overall density it changes neither the bias nor the RRMSE materially.
+- **Precision.** Canopy increases the RRMSE from `r round(results$rrmse[1], 3)` to `r round(results$rrmse[2], 3)`, because fewer groups are detected.
+
+## Discussion
+
+For the overall moose density in Riding Mountain National Park, spatially varying detectability matters for precision but not for bias. Pooling robustness has limits, though: it does not protect estimates for parts of the area where detectability differs from the average, such as density in dense forest alone, and it requires the design to sample canopy conditions representatively [@rexstad2023]. A design whose transects under-sample dense forest, or estimates reported by habitat, need the canopy covariate in the analysis. These are the situations where simulating detectability from the canopy raster is most useful, because constant detectability would hide the problem.
+
+The [next article](simulation-multispecies.qmd) combines it with species-specific detectability to simulate a multi-species survey.
+
+## Saving
+
+```{r}
+#| label: save
+write.csv(results, here("workflow", "outputs", "simulation_detectability.csv"), row.names = FALSE)
+```
+
+**Next:** [Simulating a multi-species survey](simulation-multispecies.qmd).
+
+## References
+
+::: {#refs}
+:::

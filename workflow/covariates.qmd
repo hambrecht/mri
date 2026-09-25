@@ -1,0 +1,166 @@
+---
+title: "Adding covariates and building a prediction grid"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+Density surface models explain variation in counts along the transects using spatial and environmental covariates, and then predict density over the whole study area from the same covariates. Covariates therefore have to be available in three places: at each sighting (to model detectability), for each segment (to fit the density surface model), and for each cell of a prediction grid (to predict from it). The `dsm` examples skip this step because their data ship with covariates already attached. Here we extract them from raster layers.
+
+We use two canopy metrics derived from airborne lidar over Riding Mountain National Park, both at 10 m resolution:
+
+- **`pabove2`**: the percentage of lidar returns above 2 m, a measure of canopy cover. Dense cover may hide animals from observers and also shapes where moose feed and shelter.
+- **`zmax`**: the maximum canopy height (m), which separates open areas, shrubs, young regenerating stands and mature forest.
+
+Any raster layer can be used in the same way. The only requirements are that it covers the whole study area and that it describes something plausibly linked to detectability or density.
+
+## Prerequisites
+
+```{r}
+#| label: packages
+#| message: false
+library(here)
+library(sf)
+library(dplyr)
+library(terra)         # raster data
+library(exactextractr) # fast zonal statistics over polygons
+library(ggplot2)
+```
+
+We load the tables built in [*Formatting aerial survey data*](data-formatting.qmd).
+
+```{r}
+#| label: load
+survey <- readRDS(here("workflow", "outputs", "survey_data.rds"))
+list2env(survey, envir = environment())
+```
+
+## Covariate rasters
+
+Both metrics are stored as the two layers of a single GeoTIFF, as whole numbers (percent and metres) to keep the file small. The raster is already in the workflow CRS; if yours is not, reproject it once with `terra::project()` before starting, rather than in every script.
+
+```{r}
+#| label: rasters
+lidar <- rast(here("data", "RMNP", "lidar", "lidar_pabove2_zmax_10m.tif"))
+names(lidar) <- c("pabove2", "zmax")
+stopifnot(same.crs(lidar, paste0("EPSG:", LOCAL)))
+lidar
+```
+
+```{r}
+#| label: fig-rasters
+#| fig-cap: "Percentage of lidar returns above 2 m (left) and maximum canopy height in metres (right)."
+#| fig-width: 10
+#| fig-height: 4
+plot(lidar, nc = 2)
+```
+
+## Detection covariates at sightings
+
+Vegetation near an animal may hide it from observers, so both metrics at each sighting location are candidate covariates for the detection function. They are extracted at the sighting points.
+
+```{r}
+#| label: point-covariates
+pts <- vect(dist, geom = c("X", "Y"), crs = paste0("EPSG:", LOCAL))
+dist <- cbind(dist, extract(lidar, pts, ID = FALSE))
+summary(dist[, c("pabove2", "zmax")])
+```
+
+## Segment covariates
+
+For segments we summarise each covariate over the strip actually searched: the segment buffered by the truncation distance. `exact_extract()` weights each raster cell by the fraction of it inside the strip, and we take the mean.
+
+```{r}
+#| label: segment-covariates
+strips <- st_buffer(segs, dist = TRUNCATION_M)
+seg_means <- exact_extract(lidar, strips, fun = "mean", progress = FALSE)
+names(seg_means) <- names(lidar)
+
+segs <- segs |>
+  bind_cols(seg_means) |>
+  st_drop_geometry() |>
+  as.data.frame()
+
+summary(segs[, names(lidar)])
+```
+
+One segment lies outside the lidar coverage. It has no sightings, so we can drop it; had it contained sightings, those would need to be dropped from `dist` and `obs` too.
+
+```{r}
+#| label: drop-na-segments
+segs <- segs[complete.cases(segs[, names(lidar)]), ]
+stopifnot(all(obs$Sample.Label %in% segs$Sample.Label))
+```
+
+## Prediction grid
+
+The prediction grid covers the study area with square cells. Cells should not be much smaller than the segments: the model cannot resolve detail below the scale it was sampled at, and many small cells make variance estimation slow. We use 500 m cells, about the length of one segment.
+
+```{r}
+#| label: grid
+CELL_SIZE_M <- 500
+
+cells <- st_make_grid(area, cellsize = CELL_SIZE_M, what = "polygons")
+centres <- st_centroid(cells)
+inside <- lengths(st_intersects(centres, area)) > 0
+
+pred <- st_sf(geometry = cells[inside])
+xy <- st_coordinates(centres[inside])
+pred$x <- xy[, 1]
+pred$y <- xy[, 2]
+pred$area <- CELL_SIZE_M^2
+nrow(pred)
+```
+
+The same covariates are then extracted for every cell.
+
+```{r}
+#| label: grid-covariates
+pred_means <- exact_extract(lidar, pred, fun = "mean", progress = FALSE)
+names(pred_means) <- names(lidar)
+pred <- bind_cols(pred, pred_means)
+
+pred <- pred[complete.cases(st_drop_geometry(pred)), ]
+nrow(pred)
+```
+
+Cells with missing covariate values fall outside the lidar coverage and are dropped: predicting there would mean predicting without data.
+
+```{r}
+#| label: fig-grid
+#| fig-cap: "Mean canopy cover (percentage of returns above 2 m) per prediction cell, with the surveyed segments in white."
+ggplot() +
+  geom_sf(data = pred, aes(fill = pabove2), colour = NA) +
+  geom_point(data = segs, aes(x, y), size = 0.1, colour = "white") +
+  scale_fill_viridis_c(name = "pabove2 (%)") +
+  theme_minimal()
+```
+
+Before saving, we check the tables again, now with the prediction grid and the covariates. This also confirms that segments and grid share a coordinate system: a grid in longitude and latitude alongside segments in metres would make every prediction an extrapolation.
+
+```{r}
+#| label: check-tables
+source(here("workflow", "R", "check_survey_data.R"))
+checks <- check_dsm_data(dist, segs, obs, pred, covariates = names(lidar),
+                         truncation = TRUNCATION_M)
+```
+
+We keep the grid as an `sf` object so it can be mapped later, and save it with the updated tables.
+
+```{r}
+#| label: save
+saveRDS(
+  list(dist = dist, obs = obs, segs = segs, pred = pred, area = area,
+       TRUNCATION_M = TRUNCATION_M, LOCAL = LOCAL, CELL_SIZE_M = CELL_SIZE_M),
+  here("workflow", "outputs", "model_data.rds")
+)
+```
+
+**Next:** [Estimating the detection function](detection-function.qmd).
+
+## References
+
+::: {#refs}
+:::

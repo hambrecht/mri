@@ -1,0 +1,328 @@
+---
+title: "Formatting aerial survey data for density surface models"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+This article is the first step of the [R workflow](index.qmd) for analysing aerial surveys of moose and other ungulates with distance sampling. We take the raw survey data, a table of sightings and a set of flight lines, and turn them into the three tables that `Distance` and `dsm` expect: detection data, segment data and observation data. The general principles are covered in the `dsm` article [*Data formatting for density surface models*](https://distancesampling.org/dsm/articles/data_format/dsm-data-formatting.html); here we apply them to a real thermal-drone survey.
+
+The example data come from an aerial ungulate survey of Riding Mountain National Park (RMNP), Manitoba, in February 2025. The survey was flown by a fixed-wing drone (Superwake SW-117) carrying a gimbal-mounted thermal and RGB camera, along north–south transects spaced 600 m apart (1.6 km in places). Video was recorded continuously. For each detection the aircraft circled the group to count and identify the animals, and the group's position was obtained by projecting the camera's view onto a digital elevation model. Moose, elk, white-tailed deer, bison and wolves were recorded. The survey and its detections are described in Superwake's [RMNP survey report](https://www.superwake.ca/s/RMNP-Report.html), which includes a map of the same dataset.
+
+## Prerequisites
+
+We need the following packages:
+
+```{r}
+#| label: packages
+#| message: false
+library(here)    # file paths relative to the project root
+library(sf)      # vector spatial data
+library(dplyr)   # data manipulation
+library(units)   # unit-aware lengths
+library(ggplot2) # plotting
+```
+
+The example data can be downloaded as [`rmnp_example_data.zip`](../data/rmnp_example_data.zip) (36 MB). The following chunk downloads and unzips it into `data/RMNP/` if it is not there yet, so you can follow along from an empty project folder.
+
+```{r}
+#| label: get-data
+if (!file.exists(here("data", "RMNP", "RMNPsightings.csv"))) {
+  dir.create(here("data"), showWarnings = FALSE)
+  zip_file <- here("data", "rmnp_example_data.zip")
+  if (!file.exists(zip_file)) {
+    download.file("https://hambrecht.github.io/mri/data/rmnp_example_data.zip",
+                  zip_file, mode = "wb")
+  }
+  unzip(zip_file, exdir = here("data"))
+}
+```
+
+If you use your own data, the minimum requirements are a table of sightings with coordinates, species and group size, and the flight lines flown on effort as a line layer.
+
+All spatial operations happen in a projected coordinate reference system (CRS) so that distances and lengths are in metres. We use NAD83(CSRS) / Canada Atlas Lambert (EPSG:3979), which works across Canada; a local UTM zone is equally good. We define it once and use it everywhere.
+
+```{r}
+#| label: crs
+LOCAL <- 3979  # projected CRS (metres) used throughout the workflow
+GLOBAL <- 4326 # WGS84 longitude/latitude, as recorded in the field
+```
+
+## Overview
+
+For a line-transect density surface model we need to build:
+
+- **Detection data** (`dist`): one row per sighting within the truncation distance, with the perpendicular `distance`, the group `size`, a unique `object` ID and any covariates that might affect detectability. This is what the detection function is fitted to.
+- **Segment data** (`segs`): one row per segment of transect, with a unique `Sample.Label`, the segment length `Effort`, the centroid coordinates `x`, `y` and any habitat covariates.
+- **Observation data** (`obs`): a lookup table linking each `object` to the `Sample.Label` of the segment it was seen from, along with `size` and `distance`.
+
+The tables are linked by `object` (detection ↔ observation) and `Sample.Label` (observation ↔ segment).
+
+## The survey data
+
+We read the raw files as they are: the sightings as a CSV file with latitude and longitude in WGS84, the flight lines flown on effort, the study area boundary, and the covariate rasters used later.
+
+```{r}
+#| label: read-raw
+sightings_raw <- read.csv(here("data", "RMNP", "RMNPsightings.csv"))
+transects_raw <- st_read(here("data", "RMNP", "SimpliedFlightTrack.shp"), quiet = TRUE)
+area_raw <- st_read(here("data", "RMNP", "RMNPArea.shp"), quiet = TRUE)
+lidar <- terra::rast(here("data", "RMNP", "lidar", "lidar_pabove2_zmax_10m.tif"))
+names(lidar) <- c("pabove2", "zmax")
+head(sightings_raw)
+```
+
+Before analysis, the detections were quality-checked. Records with missing coordinates, records made while moving between transects or after dusk, and animals that could not be identified were removed; the file contains the `r nrow(sightings_raw)` records that remained. We keep the five target species.
+
+```{r}
+#| label: species
+SPECIES_KEEP <- c("Moose", "Elk", "Deer", "Wolf", "Bison")
+sightings_raw <- filter(sightings_raw, Species %in% SPECIES_KEEP)
+nrow(sightings_raw)
+```
+
+## Checking the data
+
+Most problems in a distance sampling analysis come from the input data. Examples are coordinates in the wrong system, group sizes stored as text, flight lines that are polygons, or sightings far from any line. These rarely cause an error; instead they quietly give wrong distances or wrong effort. `check_survey_data()` tests the raw inputs before any processing. It is defined in [`workflow/R/check_survey_data.R`](R/check_survey_data.R), shown in full at the [end of this article](#appendix-the-check-functions).
+
+```{r}
+#| label: source-checks
+source(here("workflow", "R", "check_survey_data.R"))
+```
+
+We pass the sightings (with the names of their species, group size and coordinate columns), the flight lines, the study area, the projected CRS we want to work in and, optionally, the covariate rasters. Each row of the result is one check, with the status PASS, WARN (worth a look), FAIL (must be fixed) or INFO. By default the function stops if any check fails; here we set `stop_on_fail = FALSE` to see the whole table.
+
+```{r}
+#| label: check-raw
+checks <- check_survey_data(
+  sightings_raw, transects_raw, area_raw, crs = LOCAL,
+  species = "Species", size = "size", coords = c("Longitude", "Latitude"),
+  covariates = lidar, stop_on_fail = FALSE
+)
+```
+
+One check fails: two records have a group size of 0.
+
+```{r}
+#| label: size-zero
+sightings_raw[sightings_raw$size <= 0, ]
+```
+
+Both are elk groups that were recorded twice, from neighbouring transects. When the video was reviewed, the positions confirmed that each was a group already recorded, and the repeat was set to a group size of 0. A record with no animals contributes nothing to abundance, but left in, its distance would still enter the detection function. We remove both and run the check again, this time letting it stop if anything fails.
+
+Always look at what a failed check points to before deciding how to fix it. Here the zeros were deliberate; in another survey they might be data-entry errors that need the correct group size instead.
+
+```{r}
+#| label: check-clean
+sightings_raw <- filter(sightings_raw, size > 0)
+checks <- check_survey_data(sightings_raw, transects_raw, area_raw, crs = LOCAL,
+                            covariates = lidar)
+```
+
+The remaining warning is expected: one sighting lies just outside the park boundary. It was seen from a flight line on effort, so we keep it.
+
+## Projecting the data
+
+With the inputs checked, we convert the sightings to spatial points and bring all three layers into the workflow CRS. Each flight line's `ID` becomes `Transect`.
+
+```{r}
+#| label: project
+sightings <- sightings_raw |>
+  select(Species, size, Latitude, Longitude) |>
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = GLOBAL, remove = FALSE) |>
+  st_transform(LOCAL)
+sightings$object <- seq_len(nrow(sightings))
+
+transects <- transects_raw |>
+  rename(Transect = ID) |>
+  st_transform(LOCAL)
+
+area <- area_raw |>
+  st_transform(LOCAL) |>
+  st_union() |>
+  st_as_sf()
+
+table(sightings$Species)
+sum(st_length(transects)) |> set_units("km")
+```
+
+Moose were seen most often, followed by deer and elk. Bison and wolves were seen only a handful of times, too few to fit a density surface for, but they can still contribute to the detection function.
+
+```{r}
+#| label: fig-survey
+#| fig-cap: "Flight lines (grey) and sightings by species in Riding Mountain National Park."
+ggplot() +
+  geom_sf(data = area, fill = NA) +
+  geom_sf(data = transects, colour = "grey60", linewidth = 0.3) +
+  geom_sf(data = sightings, aes(colour = Species), size = 1) +
+  theme_minimal()
+```
+
+## Detection data
+
+### Perpendicular distances
+
+The distance from each sighting to the nearest flight line is its perpendicular distance.
+
+```{r}
+#| label: distances
+nearest_line <- st_nearest_feature(sightings, transects)
+sightings$distance <- as.numeric(
+  st_distance(sightings, transects[nearest_line, ], by_element = TRUE)
+)
+summary(sightings$distance)
+```
+
+```{r}
+#| label: fig-distance-hist
+#| fig-cap: "Histogram of perpendicular distances for all species."
+hist(sightings$distance, breaks = 20, main = "", xlab = "Distance (m)")
+```
+
+### Truncation
+
+Sightings far from the line carry little information about the shape of the detection function and can make fitting harder. A common rule is to discard the furthest 5% of distances [@buckland2001]. We compute the truncation distance once here and reuse it in every later step, so the segment strip width, the detection function and the density surface model all agree.
+
+```{r}
+#| label: truncation
+TRUNCATION_M <- as.numeric(quantile(sightings$distance, probs = 0.95))
+TRUNCATION_M
+```
+
+## Segment data
+
+### Segmenting
+
+The density surface model works on short pieces of transect called segments. Segments should be roughly square, so we make them about twice the truncation distance long [@miller2013]. `st_segmentize()` adds vertices so that no edge is longer than this, and `stdh_cast_substring()` splits each line at every vertex, as in the `dsm` data formatting article.
+
+```{r}
+#| label: cast-substring
+# Split lines into vertex-to-vertex pieces.
+# From https://dieghernan.github.io/201905_Cast-to-subsegments/
+stdh_cast_substring <- function(x, to = "MULTILINESTRING") {
+  ggg <- st_geometry(x)
+  if (!unique(st_geometry_type(ggg)) %in% c("POLYGON", "LINESTRING")) {
+    stop("Input should be LINESTRING or POLYGON")
+  }
+  geom_list <- vector("list", length(ggg))
+  for (k in seq_along(ggg)) {
+    sub <- ggg[k]
+    geom_list[[k]] <- lapply(
+      1:(length(st_coordinates(sub)[, 1]) - 1),
+      function(i) rbind(
+        as.numeric(st_coordinates(sub)[i, 1:2]),
+        as.numeric(st_coordinates(sub)[i + 1, 1:2])
+      )
+    ) |>
+      st_multilinestring() |>
+      st_sfc()
+  }
+  endgeom <- do.call(rbind, geom_list) |> st_sfc(crs = st_crs(x))
+  if (class(x)[1] == "sf") endgeom <- st_set_geometry(x, endgeom)
+  if (to == "LINESTRING") endgeom <- st_cast(endgeom, "LINESTRING")
+  endgeom
+}
+```
+
+```{r}
+#| label: segment
+SEGMENT_LENGTH_M <- 2 * TRUNCATION_M
+
+segs <- transects |>
+  st_segmentize(dfMaxLength = set_units(SEGMENT_LENGTH_M, "m")) |>
+  stdh_cast_substring(to = "LINESTRING")
+
+segs$Effort <- as.numeric(st_length(segs))
+segs <- segs |>
+  group_by(Transect) |>
+  mutate(Sample.Label = paste("2025-RMNP", Transect, row_number(), sep = "-")) |>
+  ungroup()
+
+nrow(segs)
+summary(segs$Effort)
+```
+
+`Effort` must be a plain number rather than a `units` object, otherwise some internal checks in `dsm()` fail.
+
+## Linking observations and segments
+
+Each sighting is assigned to its nearest segment. We measure the distance to the segment *line* here rather than to its centroid, which would be wrong near segment ends. Sightings beyond the truncation distance are then dropped.
+
+```{r}
+#| label: link
+nearest_seg <- st_nearest_feature(sightings, segs)
+sightings$Sample.Label <- segs$Sample.Label[nearest_seg]
+
+dist <- sightings |>
+  filter(distance <= TRUNCATION_M) |>
+  mutate(X = st_coordinates(geometry)[, 1], Y = st_coordinates(geometry)[, 2]) |>
+  st_drop_geometry() |>
+  as.data.frame()
+
+nrow(dist)
+```
+
+Only now do we reduce the segments to their centroids. The centroid coordinates, in metres, become the `x` and `y` of the spatial smooth in the density surface model.
+
+```{r}
+#| label: centroids
+seg_xy <- st_coordinates(st_centroid(segs))
+segs$x <- seg_xy[, "X"]
+segs$y <- seg_xy[, "Y"]
+```
+
+The observation table is a subset of the detection data columns:
+
+```{r}
+#| label: obs-table
+obs <- dist[, c("object", "Sample.Label", "Species", "size", "distance")]
+head(obs)
+```
+
+## Checking the tables
+
+`check_dsm_data()` checks the three tables against what `ds()` and `dsm()` expect:
+
+- the required columns are present;
+- IDs are unique and every observation links to a detection and a segment;
+- effort and distances are valid, and no column is still a `units` object.
+
+The segments are still an `sf` object at this point, so we drop the geometry for the check.
+
+```{r}
+#| label: check-tables
+checks <- check_dsm_data(dist, st_drop_geometry(segs), obs, truncation = TRUNCATION_M)
+```
+
+## Saving
+
+We keep `segs` as an `sf` object (the line geometry is needed to extract habitat covariates in the [next article](covariates.qmd)) and save everything together.
+
+```{r}
+#| label: save
+dir.create(here("workflow", "outputs"), recursive = TRUE, showWarnings = FALSE)
+saveRDS(
+  list(dist = dist, obs = obs, segs = segs, area = area,
+       TRUNCATION_M = TRUNCATION_M, LOCAL = LOCAL),
+  here("workflow", "outputs", "survey_data.rds")
+)
+```
+
+**Next:** [Adding covariates and building a prediction grid](covariates.qmd).
+
+## References
+
+::: {#refs}
+:::
+
+## Appendix: the check functions {.appendix}
+
+The two check functions, from [`workflow/R/check_survey_data.R`](R/check_survey_data.R). Copy the file into your own project and `source()` it. The tests in [`workflow/R/test-check_survey_data.R`](R/test-check_survey_data.R) show each check catching the problem it is meant to catch.
+
+```{r}
+#| label: check-functions
+#| eval: false
+#| file: R/check_survey_data.R
+```

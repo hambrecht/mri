@@ -1,0 +1,97 @@
+---
+title: "R workflow: density surface models for aerial ungulate surveys"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+This series of articles walks through a complete distance sampling analysis of an aerial survey in R: from raw sightings and flight lines to maps of density and estimates of abundance with their uncertainty. The results are then used to simulate and compare designs for future drone surveys. It uses real data from a 2025 thermal-drone survey of moose, elk, deer, bison and wolves in Riding Mountain National Park, Manitoba, flown by Superwake; their [survey report](https://www.superwake.ca/s/RMNP-Report.html) describes the survey and maps the same detections.
+
+The articles are written in the same style as the `dsm` and `dsims` package articles on [distancesampling.org](https://distancesampling.org), and link to them where they cover the general method. They add the steps those examples leave out: turning flight tracks into segments, extracting covariates from raster layers, building a prediction grid, and fitting species-specific models to a multi-species survey following @roberts2016.
+
+## The workflow
+
+```{mermaid}
+flowchart LR
+  A["Formatting survey data<br/>survey_data.rds"] --> B["Covariates and prediction grid<br/>model_data.rds"]
+  B --> C["Detection function<br/>detection_function.rds"]
+  C --> D["Density surface model<br/>dsm_models.rds"]
+  B --> D
+  D --> E["Abundance and uncertainty<br/>moose_density.rds"]
+  D --> F["From DSM to simulation<br/>simulation_setup.rds"]
+  C --> F
+  F --> G["Survey designs with subplots<br/>simulation_designs.rds"]
+  G --> H["Spatially varying detectability"]
+  G --> I["Multi-species survey"]
+```
+
+| Article | What it does | Main packages |
+|---|---|---|
+| [Formatting aerial survey data](data-formatting.qmd) | Reads sightings and flight lines, computes perpendicular distances, chooses the truncation distance, cuts transects into segments and builds the detection, segment and observation tables | `sf` |
+| [Adding covariates and building a prediction grid](covariates.qmd) | Extracts lidar canopy cover and height at sightings, over segment strips and over a 500 m prediction grid | `terra`, `exactextractr` |
+| [Estimating the detection function](detection-function.qmd) | Fits half-normal and hazard-rate detection functions with species and canopy covariates, compares them by AIC and selects one | `Distance` |
+| [Fitting a density surface model](dsm.qmd) | Fits habitat and spatial DSMs per species, checks them and assesses extrapolation | `dsm`, `dsmextra` |
+| [Estimating abundance and its uncertainty](abundance.qmd) | Predicts density, estimates variance, maps uncertainty and tabulates abundance for all species | `dsm` |
+| [From density surface model to simulation](simulation-density.qmd) | Converts the DSMs, group sizes and detection function for moose, deer and elk into the region, density, population and detectability objects of `dsims` | `dsims` |
+| [Survey designs with subplots](simulation-design.qmd) | Sets up the standard Alberta segmented grid of 10 km transects, generates subplots sized for one drone flight with systematic and zigzag transects inside them, compares coverage and effort with a design across the whole park, and simulates all four designs | `dsims`, `dssd` |
+| [Simulating spatially varying detectability](simulation-detectability.qmd) | Makes moose detectability depend on the canopy cover at each animal, and tests whether the analysis needs the canopy covariate | `dsims` (fork) |
+| [Simulating a multi-species survey](simulation-multispecies.qmd) | Simulates moose, deer and elk on the same transects and compares a pooled detection function with separate ones per species | `dsims` (fork), `Distance` |
+
+The first five articles are the core analysis. The last four use its results to test survey designs by simulation and can be skipped if you only need estimates from your own survey.
+
+Each article ends by saving its results to `workflow/outputs/`, and the next one starts by loading them. You can therefore start at any article, as long as the files from the previous step exist.
+
+**All the code of the five core articles is also available as a single script, [`rmnp_workflow.R`](rmnp_workflow.R).** It includes the data check functions, and it is the easiest starting point for analysing your own survey: replace the file names and column names in the first section, run the checks, and work through the script. The simulation articles are kept separate, because they are only needed when planning a new survey.
+
+## Getting started
+
+Download the example data, [`rmnp_example_data.zip`](../data/rmnp_example_data.zip) (36 MB), and unzip it into a `data/` folder in your project. The [first article](data-formatting.qmd) also downloads it automatically if it is missing. The zip contains `RMNP/`:
+
+- `RMNPsightings.csv`: quality-checked sightings with species, group size, latitude and longitude;
+- `SimpliedFlightTrack.shp`: flight lines on effort;
+- `RMNPArea.shp`: the study area boundary;
+- `lidar/lidar_pabove2_zmax_10m.tif`: lidar canopy cover (`pabove2`, %) and canopy height (`zmax`, m) at 10 m.
+
+The code uses `here()` for file paths, so run it from an RStudio project, or any folder that contains a `.here` file or a Git repository.
+
+To use your own data, you need the same four ingredients: sightings with coordinates, species and group size; the lines flown on effort; a study area polygon; and covariate rasters covering the study area.
+
+## Packages
+
+Most packages come from CRAN:
+
+```r
+install.packages(c("Distance", "mgcv", "tweedie", "sf", "terra", "exactextractr",
+                   "dplyr", "units", "ggplot2", "here", "remotes"))
+```
+
+Four packages are installed from GitHub, from forks maintained for this workflow. The forks are based on the development versions in the [DistanceDevelopment](https://github.com/DistanceDevelopment) repositories rather than the CRAN releases. The CRAN releases of `dsims` and `dssd` date from April 2025, and the development versions include changes made since then. The table lists what each fork adds on top of the development version.
+
+| Package | Fork | Changes from the development version | Needed for |
+|---|---|---|---|
+| `dsm` | [hambrecht/dsm](https://github.com/hambrecht/dsm) | Speed improvements to `dsm_var_gam()` and to `summary()` of variance objects. Results are identical to the original. | [Density surface model](dsm.qmd), [Abundance](abundance.qmd) (optional) |
+| `dsmextra` | [hambrecht/dsmextra](https://github.com/hambrecht/dsmextra) | Removes the dependency on the retired `rgdal` package and a deprecated `dplyr` function. `dsmextra` is not on CRAN; these changes are also merged into the [original repository](https://github.com/densitymodelling/dsmextra). | [Density surface model](dsm.qmd) (required) |
+| `dssd` | [hambrecht/dssd](https://github.com/hambrecht/dssd) | Parallel `run.coverage()`, and much faster transect generation and coverage grids. Results are identical to the original. | Survey design and simulation (optional, speed only) |
+| `dsims` | [hambrecht/dsims](https://github.com/hambrecht/dsims) | **New:** detectability that varies with a raster covariate at each animal's location (`cov.surface` in `make.detectability()`). Also faster parallel simulations. | Simulation with spatially varying detectability (required) |
+
+Install them in this order, so that `dsims` finds the forked `dssd`:
+
+```r
+remotes::install_github(c("hambrecht/dsm", "hambrecht/dsmextra",
+                          "hambrecht/dssd", "hambrecht/dsims"))
+```
+
+Alternatively, the exact package versions used to build these articles are recorded with `renv` in the [website repository](https://github.com/hambrecht/mri). After cloning it, `renv::restore()` from the repository root installs all of them, including the forks.
+
+## Further reading
+
+- The `dsm` articles [*Data formatting*](https://distancesampling.org/dsm/articles/data_format/dsm-data-formatting.html) and [*A simple DSM analysis*](https://distancesampling.org/dsm/articles/lines_gomex/mexico-analysis.html).
+- The `dsims` articles [*Getting started*](https://distancesampling.org/dsims/articles/GettingStarted.html) and [*Examples*](https://distancesampling.org/dsims/articles/dsims-examples.html), for simulating survey designs.
+- @miller2013 for an overview of density surface models, and @buckland2001 for distance sampling in general.
+
+## References
+
+::: {#refs}
+:::

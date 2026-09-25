@@ -1,0 +1,163 @@
+---
+title: "Estimating abundance and its uncertainty"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+With a [density surface model](dsm.qmd) for each species, we can predict abundance in every cell of the prediction grid, sum the cells to get the total for the study area, and estimate how uncertain those numbers are. This article covers those steps for the RMNP survey and produces the moose density surface that is used later to simulate new survey designs.
+
+## Prerequisites
+
+```{r}
+#| label: packages
+#| message: false
+library(here)
+library(dsm)
+library(sf)
+library(ggplot2)
+```
+
+These articles were built with a [fork of `dsm`](https://github.com/hambrecht/dsm) (`remotes::install_github("hambrecht/dsm")`) that includes speed improvements to `dsm_var_gam()`. The CRAN version gives the same results (see [Packages](index.qmd#packages)).
+
+We load the prediction grid from [*Adding covariates and building a prediction grid*](covariates.qmd) and the fitted models from [*Fitting a density surface model*](dsm.qmd).
+
+```{r}
+#| label: load
+model_data <- readRDS(here("workflow", "outputs", "model_data.rds"))
+list2env(model_data, envir = environment())
+models <- readRDS(here("workflow", "outputs", "dsm_models.rds"))
+list2env(models, envir = environment())
+
+pred_df <- st_drop_geometry(pred)
+area_km2 <- sum(pred_df$area) / 1e6
+area_km2
+```
+
+## Abundance estimation
+
+`predict()` returns the expected number of animals in each cell. The cell area is passed as the offset, so predictions are in animals per cell rather than per unit of effort.
+
+```{r}
+#| label: predict-moose
+dsm_moose <- dsm_species$Moose
+pred$N_moose <- predict(dsm_moose, pred_df, off.set = pred_df$area)
+sum(pred$N_moose)
+```
+
+Dividing by cell area in km² gives density, which is easier to compare between studies.
+
+```{r}
+#| label: fig-density
+#| fig-cap: "Predicted moose density (animals per km²)."
+pred$D_moose <- pred$N_moose / (pred_df$area / 1e6)
+ggplot(pred) +
+  geom_sf(aes(fill = D_moose), colour = NA) +
+  scale_fill_viridis_c(name = "Moose / km²") +
+  theme_minimal()
+```
+
+## Variance estimation
+
+The uncertainty in abundance comes from both stages of the model: the detection function and the density surface. The `dsm` package offers two ways to combine them.
+
+- **Variance propagation** (`dsm_var_prop()`) refits the GAM with the detection function's uncertainty included [@bravington2021]. It requires the `count` response, which in turn requires detection covariates that are constant within a segment, such as weather or observer.
+- **The delta method** (`dsm_var_gam()`) estimates the GAM variance and adds the detection function's coefficient of variation (CV), assuming the two are independent: $\text{CV}_\text{total}^2 = \text{CV}_\text{GAM}^2 + \text{CV}_\text{detection}^2$.
+
+Our detection covariates, species and the canopy cover at each sighting, vary between animals within the same segment. We therefore use the `abundance.est` response and the delta method.
+
+```{r}
+#| label: var-gam
+var_moose <- dsm_var_gam(dsm_moose, pred.data = pred_df, off.set = pred_df$area)
+summary(var_moose)
+```
+
+For a map of uncertainty we need the variance of each cell separately, so we split the grid into one data frame per cell. The per-cell values include only the GAM uncertainty. The map therefore shows where uncertainty from the density surface is largest.
+
+```{r}
+#| label: var-cells
+var_cells <- dsm_var_gam(dsm_moose, pred.data = split(pred_df, seq_len(nrow(pred_df))),
+                         off.set = pred_df$area)
+pred$CV_moose <- sqrt(var_cells$pred.var) / pred$N_moose
+```
+
+```{r}
+#| label: fig-cv
+#| fig-cap: "Coefficient of variation of predicted moose abundance per cell (GAM uncertainty only)."
+ggplot(pred) +
+  geom_sf(aes(fill = CV_moose), colour = NA) +
+  scale_fill_viridis_c(name = "CV", option = "magma") +
+  theme_minimal()
+```
+
+## Abundance of all species
+
+The same steps give totals for every species. We report the estimate, its standard error and coefficient of variation, and a 95% confidence interval based on a log-normal distribution, which keeps the lower limit above zero.
+
+```{r}
+#| label: all-species
+abundance_row <- function(species, model) {
+  s <- summary(dsm_var_gam(model, pred.data = pred_df, off.set = pred_df$area))
+  N <- s$pred.est
+  cv <- s$cv
+  C <- exp(qnorm(0.975) * sqrt(log(1 + cv^2)))
+  rhs <- sub(" + offset(off.set)", "", deparse(formula(model)[[3]]), fixed = TRUE)
+  data.frame(Species = species, Model = rhs,
+             N = round(N), Density_km2 = round(N / area_km2, 3),
+             SE = round(s$se), CV = round(cv, 3),
+             Lower95 = round(N / C), Upper95 = round(N * C))
+}
+
+abundance <- do.call(rbind, Map(abundance_row, names(dsm_species), dsm_species))
+abundance
+```
+
+## Habitat or space?
+
+How much do the habitat covariates change the answer? We compare the moose habitat model with the spatial model `s(x, y)` from the [previous article](dsm.qmd).
+
+```{r}
+#| label: compare-xy
+pred$N_moose_xy <- predict(dsm_xy, pred_df, off.set = pred_df$area)
+s_xy <- summary(dsm_var_gam(dsm_xy, pred.data = pred_df, off.set = pred_df$area))
+data.frame(Model = c("habitat", "spatial s(x, y)"),
+           N = round(c(summary(var_moose)$pred.est, s_xy$pred.est)),
+           CV = round(c(summary(var_moose)$cv, s_xy$cv), 3))
+```
+
+```{r}
+#| label: fig-compare-xy
+#| fig-cap: "Predicted moose density from the habitat model (left) and the spatial model (right)."
+#| fig-width: 10
+#| fig-height: 4
+maps <- rbind(
+  data.frame(model = "habitat", D = pred$D_moose, geometry = pred$geometry),
+  data.frame(model = "spatial s(x, y)", D = pred$N_moose_xy / (pred_df$area / 1e6),
+             geometry = pred$geometry)
+) |> st_as_sf()
+ggplot(maps) +
+  geom_sf(aes(fill = D), colour = NA) +
+  facet_wrap(~model) +
+  scale_fill_viridis_c(name = "Moose / km²") +
+  theme_minimal()
+```
+
+The spatial model reproduces where moose were seen; the habitat model predicts from the forest structure everywhere in the park. The two models have similar precision but differ in their totals, which shows that the choice of covariates matters for the estimate, not only for the map. Neither model explains much deviance, so this difference is itself uncertain. The habitat model has the advantage that it can be transferred to years or areas without survey data, as long as the covariates stay within the sampled range (see [Extrapolation](dsm.qmd#extrapolation)).
+
+## Saving
+
+The moose density surface is the starting point for [simulating survey designs](simulation-density.qmd).
+
+```{r}
+#| label: save
+saveRDS(pred[, c("x", "y", "area", "N_moose", "D_moose", "CV_moose")],
+        here("workflow", "outputs", "moose_density.rds"))
+write.csv(abundance, here("workflow", "outputs", "abundance.csv"), row.names = FALSE)
+```
+
+## References
+
+::: {#refs}
+:::

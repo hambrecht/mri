@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Leonard Hambrecht, IRSS, University of British Columbia">
+<meta name="dcterms.date" content="2026-09-01">
+
+<title>Formatting aerial survey data for density surface models – Moose Research Initiative — Theme 4</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../workflow/covariates.html" rel="next">
+<link href="../workflow/index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-6eba37edd638181bfbc71158b3bbdcd4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Moose Research Initiative — Theme 4</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://irsslab.forestry.ubc.ca/" target="_blank"> 
+<span class="menu-text">IRSS</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://friresearch.ca/" target="_blank"> 
+<span class="menu-text">fRI Research</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="mailto:137965368+hambrecht@users.noreply.github.com"> <i class="bi bi-envelope" role="img">
+</i> 
+<span class="menu-text">Contact</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/hambrecht/mri"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../workflow/index.html">R Workflow</a></li><li class="breadcrumb-item"><a href="../workflow/data-formatting.html">Formatting survey data</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Best Practice Guide</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Supporting Research</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Simulations Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sim_multiplatform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi-platform Simulations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sim_quadcopter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quadcopter Simulations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../dl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deep Learning</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../workflow/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Workflow</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/data-formatting.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Formatting survey data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Covariates and prediction grid</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/detection-function.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Detection function</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/dsm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Density surface model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/abundance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Abundance and uncertainty</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Survey simulation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/simulation-density.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From DSM to simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/simulation-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey designs with subplots</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workflow/simulation-detectability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Spatially varying detectability</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#the-survey-data" id="toc-the-survey-data" class="nav-link" data-scroll-target="#the-survey-data">The survey data</a></li>
+  <li><a href="#checking-the-data" id="toc-checking-the-data" class="nav-link" data-scroll-target="#checking-the-data">Checking the data</a></li>
+  <li><a href="#projecting-the-data" id="toc-projecting-the-data" class="nav-link" data-scroll-target="#projecting-the-data">Projecting the data</a></li>
+  <li><a href="#detection-data" id="toc-detection-data" class="nav-link" data-scroll-target="#detection-data">Detection data</a>
+  <ul class="collapse">
+  <li><a href="#perpendicular-distances" id="toc-perpendicular-distances" class="nav-link" data-scroll-target="#perpendicular-distances">Perpendicular distances</a></li>
+  <li><a href="#truncation" id="toc-truncation" class="nav-link" data-scroll-target="#truncation">Truncation</a></li>
+  </ul></li>
+  <li><a href="#segment-data" id="toc-segment-data" class="nav-link" data-scroll-target="#segment-data">Segment data</a>
+  <ul class="collapse">
+  <li><a href="#segmenting" id="toc-segmenting" class="nav-link" data-scroll-target="#segmenting">Segmenting</a></li>
+  </ul></li>
+  <li><a href="#linking-observations-and-segments" id="toc-linking-observations-and-segments" class="nav-link" data-scroll-target="#linking-observations-and-segments">Linking observations and segments</a></li>
+  <li><a href="#checking-the-tables" id="toc-checking-the-tables" class="nav-link" data-scroll-target="#checking-the-tables">Checking the tables</a></li>
+  <li><a href="#saving" id="toc-saving" class="nav-link" data-scroll-target="#saving">Saving</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../workflow/index.html">R Workflow</a></li><li class="breadcrumb-item"><a href="../workflow/data-formatting.html">Formatting survey data</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Formatting aerial survey data for density surface models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Leonard Hambrecht, IRSS, University of British Columbia </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 1, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This article is the first step of the <a href="../workflow/index.html">R workflow</a> for analysing aerial surveys of moose and other ungulates with distance sampling. We take the raw survey data, a table of sightings and a set of flight lines, and turn them into the three tables that <code>Distance</code> and <code>dsm</code> expect: detection data, segment data and observation data. The general principles are covered in the <code>dsm</code> article <a href="https://distancesampling.org/dsm/articles/data_format/dsm-data-formatting.html"><em>Data formatting for density surface models</em></a>; here we apply them to a real thermal-drone survey.</p>
+<p>The example data come from an aerial ungulate survey of Riding Mountain National Park (RMNP), Manitoba, in February 2025. The survey was flown by a fixed-wing drone (Superwake SW-117) carrying a gimbal-mounted thermal and RGB camera, along north–south transects spaced 600 m apart (1.6 km in places). Video was recorded continuously. For each detection the aircraft circled the group to count and identify the animals, and the group’s position was obtained by projecting the camera’s view onto a digital elevation model. Moose, elk, white-tailed deer, bison and wolves were recorded.</p>
+</section>
+<section id="prerequisites" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<p>We need the following packages:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)    <span class="co"># file paths relative to the project root</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)      <span class="co"># vector spatial data</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)   <span class="co"># data manipulation</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(units)   <span class="co"># unit-aware lengths</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2) <span class="co"># plotting</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The example data can be downloaded as <a href="../data/rmnp_example_data.zip"><code>rmnp_example_data.zip</code></a> (36 MB). The following chunk downloads and unzips it into <code>data/RMNP/</code> if it is not there yet, so you can follow along from an empty project folder.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"RMNPsightings.csv"</span>))) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="fu">here</span>(<span class="st">"data"</span>), <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  zip_file <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"rmnp_example_data.zip"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(zip_file)) {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">download.file</span>(<span class="st">"https://hambrecht.github.io/mri/data/rmnp_example_data.zip"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                  zip_file, <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unzip</span>(zip_file, <span class="at">exdir =</span> <span class="fu">here</span>(<span class="st">"data"</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>If you use your own data, the minimum requirements are a table of sightings with coordinates, species and group size, and the flight lines flown on effort as a line layer.</p>
+<p>All spatial operations happen in a projected coordinate reference system (CRS) so that distances and lengths are in metres. We use NAD83(CSRS) / Canada Atlas Lambert (EPSG:3979), which works across Canada; a local UTM zone is equally good. We define it once and use it everywhere.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>LOCAL <span class="ot">&lt;-</span> <span class="dv">3979</span>  <span class="co"># projected CRS (metres) used throughout the workflow</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>GLOBAL <span class="ot">&lt;-</span> <span class="dv">4326</span> <span class="co"># WGS84 longitude/latitude, as recorded in the field</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>For a line-transect density surface model we need to build:</p>
+<ul>
+<li><strong>Detection data</strong> (<code>dist</code>): one row per sighting within the truncation distance, with the perpendicular <code>distance</code>, the group <code>size</code>, a unique <code>object</code> ID and any covariates that might affect detectability. This is what the detection function is fitted to.</li>
+<li><strong>Segment data</strong> (<code>segs</code>): one row per segment of transect, with a unique <code>Sample.Label</code>, the segment length <code>Effort</code>, the centroid coordinates <code>x</code>, <code>y</code> and any habitat covariates.</li>
+<li><strong>Observation data</strong> (<code>obs</code>): a lookup table linking each <code>object</code> to the <code>Sample.Label</code> of the segment it was seen from, along with <code>size</code> and <code>distance</code>.</li>
+</ul>
+<p>The tables are linked by <code>object</code> (detection ↔︎ observation) and <code>Sample.Label</code> (observation ↔︎ segment).</p>
+</section>
+<section id="the-survey-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-survey-data">The survey data</h2>
+<p>We read the raw files as they are: the sightings as a CSV file with latitude and longitude in WGS84, the flight lines flown on effort, the study area boundary, and the covariate rasters used later.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sightings_raw <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"RMNPsightings.csv"</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>transects_raw <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"SimpliedFlightTrack.shp"</span>), <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>area_raw <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"RMNPArea.shp"</span>), <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>lidar <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"RMNP"</span>, <span class="st">"lidar"</span>, <span class="st">"lidar_pabove2_zmax_10m.tif"</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lidar) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"pabove2"</span>, <span class="st">"zmax"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sightings_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Species size Latitude Longitude
+1   Bison    4 50.79266 -100.2495
+2   Bison    7 50.79422 -100.2436
+3   Bison    2 50.79136 -100.2426
+4   Bison    6 50.78630 -100.2385
+5   Bison   21 50.78118 -100.2375
+6    Deer    1 50.71589 -100.2134</code></pre>
+</div>
+</div>
+<p>Before analysis, the detections were quality-checked. Records with missing coordinates, records made while moving between transects or after dusk, and animals that could not be identified were removed; the file contains the 357 records that remained. We keep the five target species.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>SPECIES_KEEP <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Moose"</span>, <span class="st">"Elk"</span>, <span class="st">"Deer"</span>, <span class="st">"Wolf"</span>, <span class="st">"Bison"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sightings_raw <span class="ot">&lt;-</span> <span class="fu">filter</span>(sightings_raw, Species <span class="sc">%in%</span> SPECIES_KEEP)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sightings_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 357</code></pre>
+</div>
+</div>
+</section>
+<section id="checking-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="checking-the-data">Checking the data</h2>
+<p>Most problems in a distance sampling analysis come from the input data. Examples are coordinates in the wrong system, group sizes stored as text, flight lines that are polygons, or sightings far from any line. These rarely cause an error; instead they quietly give wrong distances or wrong effort. <code>check_survey_data()</code> tests the raw inputs before any processing. It is defined in <a href="R/check_survey_data.R"><code>workflow/R/check_survey_data.R</code></a>, shown in full at the <a href="#appendix-the-check-functions">end of this article</a>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"R"</span>, <span class="st">"check_survey_data.R"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>We pass the sightings (with the names of their species, group size and coordinate columns), the flight lines, the study area, the projected CRS we want to work in and, optionally, the covariate rasters. Each row of the result is one check, with the status PASS, WARN (worth a look), FAIL (must be fixed) or INFO. By default the function stops if any check fails; here we set <code>stop_on_fail = FALSE</code> to see the whole table.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>checks <span class="ot">&lt;-</span> <span class="fu">check_survey_data</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  sightings_raw, transects_raw, area_raw, <span class="at">crs =</span> LOCAL,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">species =</span> <span class="st">"Species"</span>, <span class="at">size =</span> <span class="st">"size"</span>, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Longitude"</span>, <span class="st">"Latitude"</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">covariates =</span> lidar, <span class="at">stop_on_fail =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PASS  sightings: has rows
+PASS  sightings: required columns
+PASS  sightings: coordinates present
+PASS  sightings: longitude/latitude in range
+PASS  sightings: group size numeric
+PASS  sightings: group size present
+FAIL  sightings: group size &gt; 0: 2 &lt;= 0
+PASS  sightings: group size whole numbers
+PASS  sightings: species recorded
+INFO  sightings: per species: Moose = 181, Deer = 118, Elk = 48, Bison = 5, Wolf = 5
+PASS  sightings: no duplicate records
+PASS  transects: sf line layer
+PASS  area: sf polygon layer
+PASS  transects: CRS defined
+PASS  area: CRS defined
+PASS  transects: valid geometries
+PASS  area: valid geometry
+PASS  target CRS projected, in metres
+PASS  transects: no zero-length lines
+INFO  transects: total length: 3756.6 km in 333 features
+WARN  sightings: inside study area: 1 outside
+PASS  transects: inside study area
+INFO  distances: median / 95% / max (m): 101 / 262 / 388
+PASS  distances: no extreme outliers
+PASS  covariates: CRS defined
+PASS  covariates: cover study area
+PASS  covariates: values at sightings</code></pre>
+</div>
+</div>
+<p>One check fails: two records have a group size of 0.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sightings_raw[sightings_raw<span class="sc">$</span>size <span class="sc">&lt;=</span> <span class="dv">0</span>, ]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Species size Latitude Longitude
+106     Elk    0 50.74593 -100.4254
+122     Elk    0 50.74514 -100.4589</code></pre>
+</div>
+</div>
+<p>Both are elk groups that were recorded twice, from neighbouring transects. When the video was reviewed, the positions confirmed that each was a group already recorded, and the repeat was set to a group size of 0. A record with no animals contributes nothing to abundance, but left in, its distance would still enter the detection function. We remove both and run the check again, this time letting it stop if anything fails.</p>
+<p>Always look at what a failed check points to before deciding how to fix it. Here the zeros were deliberate; in another survey they might be data-entry errors that need the correct group size instead.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sightings_raw <span class="ot">&lt;-</span> <span class="fu">filter</span>(sightings_raw, size <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>checks <span class="ot">&lt;-</span> <span class="fu">check_survey_data</span>(sightings_raw, transects_raw, area_raw, <span class="at">crs =</span> LOCAL,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">covariates =</span> lidar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PASS  sightings: has rows
+PASS  sightings: required columns
+PASS  sightings: coordinates present
+PASS  sightings: longitude/latitude in range
+PASS  sightings: group size numeric
+PASS  sightings: group size present
+PASS  sightings: group size &gt; 0
+PASS  sightings: group size whole numbers
+PASS  sightings: species recorded
+INFO  sightings: per species: Moose = 181, Deer = 118, Elk = 46, Bison = 5, Wolf = 5
+PASS  sightings: no duplicate records
+PASS  transects: sf line layer
+PASS  area: sf polygon layer
+PASS  transects: CRS defined
+PASS  area: CRS defined
+PASS  transects: valid geometries
+PASS  area: valid geometry
+PASS  target CRS projected, in metres
+PASS  transects: no zero-length lines
+INFO  transects: total length: 3756.6 km in 333 features
+WARN  sightings: inside study area: 1 outside
+PASS  transects: inside study area
+INFO  distances: median / 95% / max (m): 100 / 261 / 388
+PASS  distances: no extreme outliers
+PASS  covariates: CRS defined
+PASS  covariates: cover study area
+PASS  covariates: values at sightings</code></pre>
+</div>
+</div>
+<p>The remaining warning is expected: one sighting lies just outside the park boundary. It was seen from a flight line on effort, so we keep it.</p>
+</section>
+<section id="projecting-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="projecting-the-data">Projecting the data</h2>
+<p>With the inputs checked, we convert the sightings to spatial points and bring all three layers into the workflow CRS. Each flight line’s <code>ID</code> becomes <code>Transect</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sightings <span class="ot">&lt;-</span> sightings_raw <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Species, size, Latitude, Longitude) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Longitude"</span>, <span class="st">"Latitude"</span>), <span class="at">crs =</span> GLOBAL, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(LOCAL)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>sightings<span class="sc">$</span>object <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(sightings))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>transects <span class="ot">&lt;-</span> transects_raw <span class="sc">|&gt;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Transect =</span> ID) <span class="sc">|&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(LOCAL)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>area <span class="ot">&lt;-</span> area_raw <span class="sc">|&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(LOCAL) <span class="sc">|&gt;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>()</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sightings<span class="sc">$</span>Species)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Bison  Deer   Elk Moose  Wolf 
+    5   118    46   181     5 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">st_length</span>(transects)) <span class="sc">|&gt;</span> <span class="fu">set_units</span>(<span class="st">"km"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3756.593 [km]</code></pre>
+</div>
+</div>
+<p>Moose were seen most often, followed by deer and elk. Bison and wolves were seen only a handful of times, too few to fit a density surface for, but they can still contribute to the detection function.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> area, <span class="at">fill =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> transects, <span class="at">colour =</span> <span class="st">"grey60"</span>, <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> sightings, <span class="fu">aes</span>(<span class="at">colour =</span> Species), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-survey" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-survey-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="data-formatting_files/figure-html/fig-survey-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-survey-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Flight lines (grey) and sightings by species in Riding Mountain National Park.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="detection-data" class="level2">
+<h2 class="anchored" data-anchor-id="detection-data">Detection data</h2>
+<section id="perpendicular-distances" class="level3">
+<h3 class="anchored" data-anchor-id="perpendicular-distances">Perpendicular distances</h3>
+<p>The distance from each sighting to the nearest flight line is its perpendicular distance.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>nearest_line <span class="ot">&lt;-</span> <span class="fu">st_nearest_feature</span>(sightings, transects)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>sightings<span class="sc">$</span>distance <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_distance</span>(sightings, transects[nearest_line, ], <span class="at">by_element =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sightings<span class="sc">$</span>distance)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+  0.6973  55.0951 100.0581 117.1489 170.1842 387.8370 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(sightings<span class="sc">$</span>distance, <span class="at">breaks =</span> <span class="dv">20</span>, <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Distance (m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-distance-hist" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-distance-hist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="data-formatting_files/figure-html/fig-distance-hist-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-distance-hist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Histogram of perpendicular distances for all species.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="truncation" class="level3">
+<h3 class="anchored" data-anchor-id="truncation">Truncation</h3>
+<p>Sightings far from the line carry little information about the shape of the detection function and can make fitting harder. A common rule is to discard the furthest 5% of distances <span class="citation" data-cites="buckland2001">(<a href="#ref-buckland2001" role="doc-biblioref">Buckland et al. 2001</a>)</span>. We compute the truncation distance once here and reuse it in every later step, so the segment strip width, the detection function and the density surface model all agree.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>TRUNCATION_M <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">quantile</span>(sightings<span class="sc">$</span>distance, <span class="at">probs =</span> <span class="fl">0.95</span>))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>TRUNCATION_M</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 261.1512</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="segment-data" class="level2">
+<h2 class="anchored" data-anchor-id="segment-data">Segment data</h2>
+<section id="segmenting" class="level3">
+<h3 class="anchored" data-anchor-id="segmenting">Segmenting</h3>
+<p>The density surface model works on short pieces of transect called segments. Segments should be roughly square, so we make them about twice the truncation distance long <span class="citation" data-cites="miller2013">(<a href="#ref-miller2013" role="doc-biblioref">Miller et al. 2013</a>)</span>. <code>st_segmentize()</code> adds vertices so that no edge is longer than this, and <code>stdh_cast_substring()</code> splits each line at every vertex, as in the <code>dsm</code> data formatting article.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split lines into vertex-to-vertex pieces.</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># From https://dieghernan.github.io/201905_Cast-to-subsegments/</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>stdh_cast_substring <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">to =</span> <span class="st">"MULTILINESTRING"</span>) {</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  ggg <span class="ot">&lt;-</span> <span class="fu">st_geometry</span>(x)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">unique</span>(<span class="fu">st_geometry_type</span>(ggg)) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"POLYGON"</span>, <span class="st">"LINESTRING"</span>)) {</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Input should be LINESTRING or POLYGON"</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  geom_list <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, <span class="fu">length</span>(ggg))</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_along</span>(ggg)) {</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    sub <span class="ot">&lt;-</span> ggg[k]</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    geom_list[[k]] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>      <span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(<span class="fu">st_coordinates</span>(sub)[, <span class="dv">1</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">function</span>(i) <span class="fu">rbind</span>(</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>(<span class="fu">st_coordinates</span>(sub)[i, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]),</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>(<span class="fu">st_coordinates</span>(sub)[i <span class="sc">+</span> <span class="dv">1</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>])</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">st_multilinestring</span>() <span class="sc">|&gt;</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">st_sfc</span>()</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  endgeom <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, geom_list) <span class="sc">|&gt;</span> <span class="fu">st_sfc</span>(<span class="at">crs =</span> <span class="fu">st_crs</span>(x))</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">class</span>(x)[<span class="dv">1</span>] <span class="sc">==</span> <span class="st">"sf"</span>) endgeom <span class="ot">&lt;-</span> <span class="fu">st_set_geometry</span>(x, endgeom)</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (to <span class="sc">==</span> <span class="st">"LINESTRING"</span>) endgeom <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(endgeom, <span class="st">"LINESTRING"</span>)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  endgeom</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>SEGMENT_LENGTH_M <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> TRUNCATION_M</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>segs <span class="ot">&lt;-</span> transects <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_segmentize</span>(<span class="at">dfMaxLength =</span> <span class="fu">set_units</span>(SEGMENT_LENGTH_M, <span class="st">"m"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stdh_cast_substring</span>(<span class="at">to =</span> <span class="st">"LINESTRING"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in st_cast.sf(endgeom, "LINESTRING"): repeating attributes for all
+sub-geometries for which they may not be constant</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>segs<span class="sc">$</span>Effort <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_length</span>(segs))</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>segs <span class="ot">&lt;-</span> segs <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Transect) <span class="sc">|&gt;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sample.Label =</span> <span class="fu">paste</span>(<span class="st">"2025-RMNP"</span>, Transect, <span class="fu">row_number</span>(), <span class="at">sep =</span> <span class="st">"-"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(segs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7359</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(segs<span class="sc">$</span>Effort)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  243.8   506.3   511.7   510.5   517.4   522.9 </code></pre>
+</div>
+</div>
+<p><code>Effort</code> must be a plain number rather than a <code>units</code> object, otherwise some internal checks in <code>dsm()</code> fail.</p>
+</section>
+</section>
+<section id="linking-observations-and-segments" class="level2">
+<h2 class="anchored" data-anchor-id="linking-observations-and-segments">Linking observations and segments</h2>
+<p>Each sighting is assigned to its nearest segment. We measure the distance to the segment <em>line</em> here rather than to its centroid, which would be wrong near segment ends. Sightings beyond the truncation distance are then dropped.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>nearest_seg <span class="ot">&lt;-</span> <span class="fu">st_nearest_feature</span>(sightings, segs)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>sightings<span class="sc">$</span>Sample.Label <span class="ot">&lt;-</span> segs<span class="sc">$</span>Sample.Label[nearest_seg]</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>dist <span class="ot">&lt;-</span> sightings <span class="sc">|&gt;</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distance <span class="sc">&lt;=</span> TRUNCATION_M) <span class="sc">|&gt;</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">X =</span> <span class="fu">st_coordinates</span>(geometry)[, <span class="dv">1</span>], <span class="at">Y =</span> <span class="fu">st_coordinates</span>(geometry)[, <span class="dv">2</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(dist)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 337</code></pre>
+</div>
+</div>
+<p>Only now do we reduce the segments to their centroids. The centroid coordinates, in metres, become the <code>x</code> and <code>y</code> of the spatial smooth in the density surface model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>seg_xy <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(<span class="fu">st_centroid</span>(segs))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: st_centroid assumes attributes are constant over geometries</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>segs<span class="sc">$</span>x <span class="ot">&lt;-</span> seg_xy[, <span class="st">"X"</span>]</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>segs<span class="sc">$</span>y <span class="ot">&lt;-</span> seg_xy[, <span class="st">"Y"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The observation table is a subset of the detection data columns:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>obs <span class="ot">&lt;-</span> dist[, <span class="fu">c</span>(<span class="st">"object"</span>, <span class="st">"Sample.Label"</span>, <span class="st">"Species"</span>, <span class="st">"size"</span>, <span class="st">"distance"</span>)]</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(obs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  object    Sample.Label Species size  distance
+1      1  2025-RMNP-24-2   Bison    4  50.72374
+2      2 2025-RMNP-25-18   Bison    7 220.69071
+3      3 2025-RMNP-25-18   Bison    2 148.85981
+4      4   2025-RMNP-2-1   Bison    6 140.27913
+5      5   2025-RMNP-2-2   Bison   21 207.12219
+6      6   2025-RMNP-5-1    Deer    1 131.75519</code></pre>
+</div>
+</div>
+</section>
+<section id="checking-the-tables" class="level2">
+<h2 class="anchored" data-anchor-id="checking-the-tables">Checking the tables</h2>
+<p><code>check_dsm_data()</code> checks the three tables against what <code>ds()</code> and <code>dsm()</code> expect:</p>
+<ul>
+<li>the required columns are present;</li>
+<li>IDs are unique and every observation links to a detection and a segment;</li>
+<li>effort and distances are valid, and no column is still a <code>units</code> object.</li>
+</ul>
+<p>The segments are still an <code>sf</code> object at this point, so we drop the geometry for the check.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>checks <span class="ot">&lt;-</span> <span class="fu">check_dsm_data</span>(dist, <span class="fu">st_drop_geometry</span>(segs), obs, <span class="at">truncation =</span> TRUNCATION_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PASS  dist: required columns
+PASS  segs: required columns
+PASS  obs: required columns
+PASS  dist: plain data.frame (not sf)
+PASS  segs: plain data.frame (not sf)
+PASS  obs: plain data.frame (not sf)
+PASS  no units-class columns
+PASS  dist: object IDs unique
+PASS  obs: object IDs unique
+PASS  segs: Sample.Label unique
+PASS  obs -&gt; dist: every object has a detection
+PASS  dist -&gt; obs: every detection is linked to a segment
+PASS  obs -&gt; segs: every Sample.Label exists
+PASS  segs: Effort &gt; 0
+PASS  dist: distances &gt;= 0
+PASS  dist: distances within truncation
+PASS  segs: coordinates present</code></pre>
+</div>
+</div>
+</section>
+<section id="saving" class="level2">
+<h2 class="anchored" data-anchor-id="saving">Saving</h2>
+<p>We keep <code>segs</code> as an <code>sf</code> object (the line geometry is needed to extract habitat covariates in the <a href="../workflow/covariates.html">next article</a>) and save everything together.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>), <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">dist =</span> dist, <span class="at">obs =</span> obs, <span class="at">segs =</span> segs, <span class="at">area =</span> area,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">TRUNCATION_M =</span> TRUNCATION_M, <span class="at">LOCAL =</span> LOCAL),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">here</span>(<span class="st">"workflow"</span>, <span class="st">"outputs"</span>, <span class="st">"survey_data.rds"</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Next:</strong> <a href="../workflow/covariates.html">Adding covariates and building a prediction grid</a>.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-buckland2001" class="csl-entry" role="listitem">
+Buckland, S. T., D. R. Anderson, K. P. Burnham, J. L. Laake, D. L. Borchers, and L. Thomas. 2001. <em>Introduction to Distance Sampling: Estimating Abundance of Biological Populations</em>. Oxford University Press.
+</div>
+<div id="ref-miller2013" class="csl-entry" role="listitem">
+Miller, David L., M. Louise Burt, Eric A. Rexstad, and Len Thomas. 2013. <span>“Spatial Models for Distance Sampling Data: Recent Developments and Future Directions.”</span> <em>Methods in Ecology and Evolution</em> 4 (11): 1001–10. <a href="https://doi.org/10.1111/2041-210X.12105">https://doi.org/10.1111/2041-210X.12105</a>.
+</div>
+</div>
+</section>
+
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="appendix-the-check-functions" class="level2 appendix"><h2 class="anchored quarto-appendix-heading">Appendix: the check functions</h2><div class="quarto-appendix-contents">
+
+<p>The two check functions, from <a href="R/check_survey_data.R"><code>workflow/R/check_survey_data.R</code></a>. Copy the file into your own project and <code>source()</code> it. The tests in <a href="R/test-check_survey_data.R"><code>workflow/R/test-check_survey_data.R</code></a> show each check catching the problem it is meant to catch.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compatibility checks for distance sampling / density surface model data.</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># check_survey_data(): raw inputs (sightings, transects, study area, rasters)</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                      before any processing.</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co"># check_dsm_data():    the formatted detection, segment, observation and</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                      prediction tables before fitting ds() and dsm().</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Both return a data.frame with one row per check (status PASS, WARN, FAIL or</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="co"># INFO), print it, and stop if any check FAILs (unless stop_on_fail = FALSE).</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Collects check results; `record(check, ok, detail)` adds a row.</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>new_checklist <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  record <span class="ot">&lt;-</span> <span class="cf">function</span>(check, ok, <span class="at">detail =</span> <span class="st">""</span>, <span class="at">level =</span> <span class="st">"FAIL"</span>) {</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    status <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">isTRUE</span>(ok)) <span class="st">"PASS"</span> <span class="cf">else</span> level</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (status <span class="sc">==</span> <span class="st">"PASS"</span>) detail <span class="ot">&lt;-</span> <span class="st">""</span> <span class="co"># details only where something needs attention</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    rows[[<span class="fu">length</span>(rows) <span class="sc">+</span> <span class="dv">1</span>]] <span class="ot">&lt;&lt;-</span> <span class="fu">data.frame</span>(<span class="at">check =</span> check, <span class="at">status =</span> status, <span class="at">detail =</span> detail)</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">invisible</span>(<span class="fu">isTRUE</span>(ok))</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>  info <span class="ot">&lt;-</span> <span class="cf">function</span>(check, detail) <span class="fu">record</span>(check, <span class="cn">FALSE</span>, detail, <span class="at">level =</span> <span class="st">"INFO"</span>)</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="cf">function</span>(stop_on_fail) {</span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>    out <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, rows)</span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"%-4s  %s%s</span><span class="sc">\n</span><span class="st">"</span>, out<span class="sc">$</span>status, out<span class="sc">$</span>check,</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>(out<span class="sc">$</span>detail <span class="sc">==</span> <span class="st">""</span>, <span class="st">""</span>, <span class="fu">paste0</span>(<span class="st">": "</span>, out<span class="sc">$</span>detail))), <span class="at">sep =</span> <span class="st">""</span>)</span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>    n_fail <span class="ot">&lt;-</span> <span class="fu">sum</span>(out<span class="sc">$</span>status <span class="sc">==</span> <span class="st">"FAIL"</span>)</span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (stop_on_fail <span class="sc">&amp;&amp;</span> n_fail <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stop</span>(n_fail, <span class="st">" check(s) failed; see the table above."</span>, <span class="at">call. =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">invisible</span>(out)</span>
+<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">record =</span> record, <span class="at">info =</span> info, <span class="at">result =</span> result)</span>
+<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a>check_survey_data <span class="ot">&lt;-</span> <span class="cf">function</span>(sightings, transects, area, crs,</span>
+<span id="cb42-37"><a href="#cb42-37" aria-hidden="true" tabindex="-1"></a>                              <span class="at">species =</span> <span class="st">"Species"</span>, <span class="at">size =</span> <span class="st">"size"</span>,</span>
+<span id="cb42-38"><a href="#cb42-38" aria-hidden="true" tabindex="-1"></a>                              <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Longitude"</span>, <span class="st">"Latitude"</span>), <span class="at">coords_crs =</span> <span class="dv">4326</span>,</span>
+<span id="cb42-39"><a href="#cb42-39" aria-hidden="true" tabindex="-1"></a>                              <span class="at">covariates =</span> <span class="cn">NULL</span>, <span class="at">stop_on_fail =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb42-40"><a href="#cb42-40" aria-hidden="true" tabindex="-1"></a>  cl <span class="ot">&lt;-</span> <span class="fu">new_checklist</span>()</span>
+<span id="cb42-41"><a href="#cb42-41" aria-hidden="true" tabindex="-1"></a>  rec <span class="ot">&lt;-</span> cl<span class="sc">$</span>record</span>
+<span id="cb42-42"><a href="#cb42-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-43"><a href="#cb42-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Sightings -------------------------------------------------------------</span></span>
+<span id="cb42-44"><a href="#cb42-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"sightings: has rows"</span>, <span class="fu">nrow</span>(sightings) <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">sprintf</span>(<span class="st">"%d rows"</span>, <span class="fu">nrow</span>(sightings)))</span>
+<span id="cb42-45"><a href="#cb42-45" aria-hidden="true" tabindex="-1"></a>  needed <span class="ot">&lt;-</span> <span class="fu">c</span>(species, size, <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(sightings, <span class="st">"sf"</span>)) coords)</span>
+<span id="cb42-46"><a href="#cb42-46" aria-hidden="true" tabindex="-1"></a>  missing_cols <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(needed, <span class="fu">names</span>(sightings))</span>
+<span id="cb42-47"><a href="#cb42-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">rec</span>(<span class="st">"sightings: required columns"</span>, <span class="fu">length</span>(missing_cols) <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb42-48"><a href="#cb42-48" aria-hidden="true" tabindex="-1"></a>           <span class="cf">if</span> (<span class="fu">length</span>(missing_cols)) <span class="fu">paste</span>(<span class="st">"missing:"</span>, <span class="fu">paste</span>(missing_cols, <span class="at">collapse =</span> <span class="st">", "</span>)) <span class="cf">else</span> <span class="st">""</span>)) {</span>
+<span id="cb42-49"><a href="#cb42-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail))</span>
+<span id="cb42-50"><a href="#cb42-50" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-51"><a href="#cb42-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-52"><a href="#cb42-52" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(sightings, <span class="st">"sf"</span>)) {</span>
+<span id="cb42-53"><a href="#cb42-53" aria-hidden="true" tabindex="-1"></a>    n_empty <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_is_empty</span>(sightings))</span>
+<span id="cb42-54"><a href="#cb42-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"sightings: no empty geometries"</span>, n_empty <span class="sc">==</span> <span class="dv">0</span>, <span class="fu">sprintf</span>(<span class="st">"%d empty"</span>, n_empty))</span>
+<span id="cb42-55"><a href="#cb42-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"sightings: CRS defined"</span>, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">st_crs</span>(sightings)))</span>
+<span id="cb42-56"><a href="#cb42-56" aria-hidden="true" tabindex="-1"></a>    pts <span class="ot">&lt;-</span> sightings[<span class="sc">!</span><span class="fu">st_is_empty</span>(sightings), ]</span>
+<span id="cb42-57"><a href="#cb42-57" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb42-58"><a href="#cb42-58" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> sightings[, coords]</span>
+<span id="cb42-59"><a href="#cb42-59" aria-hidden="true" tabindex="-1"></a>    bad_xy <span class="ot">&lt;-</span> <span class="sc">!</span>stats<span class="sc">::</span><span class="fu">complete.cases</span>(xy)</span>
+<span id="cb42-60"><a href="#cb42-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"sightings: coordinates present"</span>, <span class="sc">!</span><span class="fu">any</span>(bad_xy), <span class="fu">sprintf</span>(<span class="st">"%d rows without coordinates"</span>, <span class="fu">sum</span>(bad_xy)))</span>
+<span id="cb42-61"><a href="#cb42-61" aria-hidden="true" tabindex="-1"></a>    keep <span class="ot">&lt;-</span> <span class="sc">!</span>bad_xy</span>
+<span id="cb42-62"><a href="#cb42-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">identical</span>(coords_crs, <span class="dv">4326</span>)) {</span>
+<span id="cb42-63"><a href="#cb42-63" aria-hidden="true" tabindex="-1"></a>      out_range <span class="ot">&lt;-</span> <span class="sc">!</span>bad_xy <span class="sc">&amp;</span> (<span class="fu">abs</span>(xy[[<span class="dv">1</span>]]) <span class="sc">&gt;</span> <span class="dv">180</span> <span class="sc">|</span> <span class="fu">abs</span>(xy[[<span class="dv">2</span>]]) <span class="sc">&gt;</span> <span class="dv">90</span>)</span>
+<span id="cb42-64"><a href="#cb42-64" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rec</span>(<span class="st">"sightings: longitude/latitude in range"</span>, <span class="sc">!</span><span class="fu">any</span>(out_range),</span>
+<span id="cb42-65"><a href="#cb42-65" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sprintf</span>(<span class="st">"%d rows out of range (are longitude and latitude swapped or projected?)"</span>, <span class="fu">sum</span>(out_range)))</span>
+<span id="cb42-66"><a href="#cb42-66" aria-hidden="true" tabindex="-1"></a>      keep <span class="ot">&lt;-</span> keep <span class="sc">&amp;</span> <span class="sc">!</span>out_range</span>
+<span id="cb42-67"><a href="#cb42-67" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb42-68"><a href="#cb42-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">any</span>(keep)) <span class="fu">return</span>(cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail))</span>
+<span id="cb42-69"><a href="#cb42-69" aria-hidden="true" tabindex="-1"></a>    pts <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(sightings[keep, ], <span class="at">coords =</span> coords, <span class="at">crs =</span> coords_crs, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb42-70"><a href="#cb42-70" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-71"><a href="#cb42-71" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(pts) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail))</span>
+<span id="cb42-72"><a href="#cb42-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-73"><a href="#cb42-73" aria-hidden="true" tabindex="-1"></a>  sz <span class="ot">&lt;-</span> sightings[[size]]</span>
+<span id="cb42-74"><a href="#cb42-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"sightings: group size numeric"</span>, <span class="fu">is.numeric</span>(sz), <span class="fu">class</span>(sz)[<span class="dv">1</span>])</span>
+<span id="cb42-75"><a href="#cb42-75" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(sz)) {</span>
+<span id="cb42-76"><a href="#cb42-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"sightings: group size present"</span>, <span class="sc">!</span><span class="fu">anyNA</span>(sz), <span class="fu">sprintf</span>(<span class="st">"%d missing"</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(sz))))</span>
+<span id="cb42-77"><a href="#cb42-77" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"sightings: group size &gt; 0"</span>, <span class="fu">all</span>(sz <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="fu">sprintf</span>(<span class="st">"%d &lt;= 0"</span>, <span class="fu">sum</span>(sz <span class="sc">&lt;=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb42-78"><a href="#cb42-78" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"sightings: group size whole numbers"</span>, <span class="fu">all</span>(sz <span class="sc">==</span> <span class="fu">round</span>(sz), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb42-79"><a href="#cb42-79" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%d non-integer"</span>, <span class="fu">sum</span>(sz <span class="sc">!=</span> <span class="fu">round</span>(sz), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-80"><a href="#cb42-80" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-81"><a href="#cb42-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-82"><a href="#cb42-82" aria-hidden="true" tabindex="-1"></a>  sp <span class="ot">&lt;-</span> <span class="fu">as.character</span>(sightings[[species]])</span>
+<span id="cb42-83"><a href="#cb42-83" aria-hidden="true" tabindex="-1"></a>  n_nosp <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(sp) <span class="sc">|</span> <span class="fu">trimws</span>(sp) <span class="sc">==</span> <span class="st">""</span>)</span>
+<span id="cb42-84"><a href="#cb42-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"sightings: species recorded"</span>, n_nosp <span class="sc">==</span> <span class="dv">0</span>, <span class="fu">sprintf</span>(<span class="st">"%d without species"</span>, n_nosp), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-85"><a href="#cb42-85" aria-hidden="true" tabindex="-1"></a>  counts <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">table</span>(sp[<span class="sc">!</span><span class="fu">is.na</span>(sp) <span class="sc">&amp;</span> <span class="fu">trimws</span>(sp) <span class="sc">!=</span> <span class="st">""</span>]), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb42-86"><a href="#cb42-86" aria-hidden="true" tabindex="-1"></a>  cl<span class="sc">$</span><span class="fu">info</span>(<span class="st">"sightings: per species"</span>, <span class="fu">paste</span>(<span class="fu">names</span>(counts), counts, <span class="at">sep =</span> <span class="st">" = "</span>, <span class="at">collapse =</span> <span class="st">", "</span>))</span>
+<span id="cb42-87"><a href="#cb42-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-88"><a href="#cb42-88" aria-hidden="true" tabindex="-1"></a>  dup <span class="ot">&lt;-</span> <span class="fu">duplicated</span>(<span class="fu">data.frame</span>(pts[[species]], <span class="fu">round</span>(<span class="fu">st_coordinates</span>(pts), <span class="dv">6</span>)))</span>
+<span id="cb42-89"><a href="#cb42-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"sightings: no duplicate records"</span>, <span class="sc">!</span><span class="fu">any</span>(dup),</span>
+<span id="cb42-90"><a href="#cb42-90" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d with the same species and location"</span>, <span class="fu">sum</span>(dup)), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-91"><a href="#cb42-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-92"><a href="#cb42-92" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Transects and study area ---------------------------------------------</span></span>
+<span id="cb42-93"><a href="#cb42-93" aria-hidden="true" tabindex="-1"></a>  line_types <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"LINESTRING"</span>, <span class="st">"MULTILINESTRING"</span>)</span>
+<span id="cb42-94"><a href="#cb42-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"transects: sf line layer"</span>,</span>
+<span id="cb42-95"><a href="#cb42-95" aria-hidden="true" tabindex="-1"></a>      <span class="fu">inherits</span>(transects, <span class="st">"sf"</span>) <span class="sc">&amp;&amp;</span> <span class="fu">all</span>(<span class="fu">st_geometry_type</span>(transects) <span class="sc">%in%</span> line_types),</span>
+<span id="cb42-96"><a href="#cb42-96" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">inherits</span>(transects, <span class="st">"sf"</span>)) <span class="fu">paste</span>(<span class="fu">unique</span>(<span class="fu">st_geometry_type</span>(transects)), <span class="at">collapse =</span> <span class="st">", "</span>) <span class="cf">else</span> <span class="fu">class</span>(transects)[<span class="dv">1</span>])</span>
+<span id="cb42-97"><a href="#cb42-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"area: sf polygon layer"</span>,</span>
+<span id="cb42-98"><a href="#cb42-98" aria-hidden="true" tabindex="-1"></a>      <span class="fu">inherits</span>(area, <span class="fu">c</span>(<span class="st">"sf"</span>, <span class="st">"sfc"</span>)) <span class="sc">&amp;&amp;</span> <span class="fu">all</span>(<span class="fu">st_geometry_type</span>(area) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"POLYGON"</span>, <span class="st">"MULTIPOLYGON"</span>)),</span>
+<span id="cb42-99"><a href="#cb42-99" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">inherits</span>(area, <span class="fu">c</span>(<span class="st">"sf"</span>, <span class="st">"sfc"</span>))) <span class="fu">paste</span>(<span class="fu">unique</span>(<span class="fu">st_geometry_type</span>(area)), <span class="at">collapse =</span> <span class="st">", "</span>) <span class="cf">else</span> <span class="fu">class</span>(area)[<span class="dv">1</span>])</span>
+<span id="cb42-100"><a href="#cb42-100" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(transects, <span class="st">"sf"</span>) <span class="sc">||</span> <span class="sc">!</span><span class="fu">inherits</span>(area, <span class="fu">c</span>(<span class="st">"sf"</span>, <span class="st">"sfc"</span>))) <span class="fu">return</span>(cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail))</span>
+<span id="cb42-101"><a href="#cb42-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-102"><a href="#cb42-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"transects: CRS defined"</span>, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">st_crs</span>(transects)))</span>
+<span id="cb42-103"><a href="#cb42-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"area: CRS defined"</span>, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">st_crs</span>(area)))</span>
+<span id="cb42-104"><a href="#cb42-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"transects: valid geometries"</span>, <span class="fu">all</span>(<span class="fu">st_is_valid</span>(transects)), <span class="fu">sprintf</span>(<span class="st">"%d invalid"</span>, <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">st_is_valid</span>(transects))))</span>
+<span id="cb42-105"><a href="#cb42-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"area: valid geometry"</span>, <span class="fu">all</span>(<span class="fu">st_is_valid</span>(area)), <span class="st">"fix with sf::st_make_valid()"</span>)</span>
+<span id="cb42-106"><a href="#cb42-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-107"><a href="#cb42-107" aria-hidden="true" tabindex="-1"></a>  target <span class="ot">&lt;-</span> <span class="fu">st_crs</span>(crs)</span>
+<span id="cb42-108"><a href="#cb42-108" aria-hidden="true" tabindex="-1"></a>  projected_m <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(target) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">isTRUE</span>(target<span class="sc">$</span>IsGeographic) <span class="sc">&amp;&amp;</span> <span class="fu">identical</span>(target<span class="sc">$</span>units_gdal, <span class="st">"metre"</span>)</span>
+<span id="cb42-109"><a href="#cb42-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"target CRS projected, in metres"</span>, projected_m,</span>
+<span id="cb42-110"><a href="#cb42-110" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">is.na</span>(target)) <span class="st">"undefined"</span> <span class="cf">else</span> <span class="fu">paste0</span>(target<span class="sc">$</span>Name, <span class="st">" ("</span>, target<span class="sc">$</span>units_gdal, <span class="st">")"</span>))</span>
+<span id="cb42-111"><a href="#cb42-111" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>projected_m <span class="sc">||</span> <span class="fu">is.na</span>(<span class="fu">st_crs</span>(transects)) <span class="sc">||</span> <span class="fu">is.na</span>(<span class="fu">st_crs</span>(area)) <span class="sc">||</span> <span class="fu">is.na</span>(<span class="fu">st_crs</span>(pts))) {</span>
+<span id="cb42-112"><a href="#cb42-112" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail))</span>
+<span id="cb42-113"><a href="#cb42-113" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-114"><a href="#cb42-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-115"><a href="#cb42-115" aria-hidden="true" tabindex="-1"></a>  pts <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(pts, target)</span>
+<span id="cb42-116"><a href="#cb42-116" aria-hidden="true" tabindex="-1"></a>  transects <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(transects, target)</span>
+<span id="cb42-117"><a href="#cb42-117" aria-hidden="true" tabindex="-1"></a>  area <span class="ot">&lt;-</span> <span class="fu">st_union</span>(<span class="fu">st_transform</span>(<span class="fu">st_geometry</span>(area), target))</span>
+<span id="cb42-118"><a href="#cb42-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-119"><a href="#cb42-119" aria-hidden="true" tabindex="-1"></a>  len <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_length</span>(transects))</span>
+<span id="cb42-120"><a href="#cb42-120" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"transects: no zero-length lines"</span>, <span class="fu">all</span>(len <span class="sc">&gt;</span> <span class="dv">0</span>), <span class="fu">sprintf</span>(<span class="st">"%d of %d"</span>, <span class="fu">sum</span>(len <span class="sc">==</span> <span class="dv">0</span>), <span class="fu">length</span>(len)))</span>
+<span id="cb42-121"><a href="#cb42-121" aria-hidden="true" tabindex="-1"></a>  cl<span class="sc">$</span><span class="fu">info</span>(<span class="st">"transects: total length"</span>, <span class="fu">sprintf</span>(<span class="st">"%.1f km in %d features"</span>, <span class="fu">sum</span>(len) <span class="sc">/</span> <span class="dv">1000</span>, <span class="fu">length</span>(len)))</span>
+<span id="cb42-122"><a href="#cb42-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-123"><a href="#cb42-123" aria-hidden="true" tabindex="-1"></a>  inside <span class="ot">&lt;-</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(pts, area)) <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb42-124"><a href="#cb42-124" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"sightings: inside study area"</span>, <span class="fu">all</span>(inside), <span class="fu">sprintf</span>(<span class="st">"%d outside"</span>, <span class="fu">sum</span>(<span class="sc">!</span>inside)), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-125"><a href="#cb42-125" aria-hidden="true" tabindex="-1"></a>  len_in <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(<span class="fu">st_length</span>(<span class="fu">st_intersection</span>(<span class="fu">st_geometry</span>(transects), area))))</span>
+<span id="cb42-126"><a href="#cb42-126" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"transects: inside study area"</span>, len_in <span class="sc">/</span> <span class="fu">sum</span>(len) <span class="sc">&gt;=</span> <span class="fl">0.95</span>,</span>
+<span id="cb42-127"><a href="#cb42-127" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%.1f%% of length inside"</span>, <span class="dv">100</span> <span class="sc">*</span> len_in <span class="sc">/</span> <span class="fu">sum</span>(len)), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-128"><a href="#cb42-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-129"><a href="#cb42-129" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(pts, transects[<span class="fu">st_nearest_feature</span>(pts, transects), ], <span class="at">by_element =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb42-130"><a href="#cb42-130" aria-hidden="true" tabindex="-1"></a>  q95 <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">quantile</span>(d, <span class="fl">0.95</span>)</span>
+<span id="cb42-131"><a href="#cb42-131" aria-hidden="true" tabindex="-1"></a>  cl<span class="sc">$</span><span class="fu">info</span>(<span class="st">"distances: median / 95% / max (m)"</span>, <span class="fu">sprintf</span>(<span class="st">"%.0f / %.0f / %.0f"</span>, stats<span class="sc">::</span><span class="fu">median</span>(d), q95, <span class="fu">max</span>(d)))</span>
+<span id="cb42-132"><a href="#cb42-132" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"distances: no extreme outliers"</span>, <span class="fu">max</span>(d) <span class="sc">&lt;=</span> <span class="dv">3</span> <span class="sc">*</span> q95,</span>
+<span id="cb42-133"><a href="#cb42-133" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d sightings &gt; 3x the 95th percentile (off-effort, or wrong transect?)"</span>, <span class="fu">sum</span>(d <span class="sc">&gt;</span> <span class="dv">3</span> <span class="sc">*</span> q95)),</span>
+<span id="cb42-134"><a href="#cb42-134" aria-hidden="true" tabindex="-1"></a>      <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-135"><a href="#cb42-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-136"><a href="#cb42-136" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Covariate rasters (optional) -----------------------------------------</span></span>
+<span id="cb42-137"><a href="#cb42-137" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(covariates)) {</span>
+<span id="cb42-138"><a href="#cb42-138" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"covariates: CRS defined"</span>, terra<span class="sc">::</span><span class="fu">crs</span>(covariates) <span class="sc">!=</span> <span class="st">""</span>)</span>
+<span id="cb42-139"><a href="#cb42-139" aria-hidden="true" tabindex="-1"></a>    samp <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">vect</span>(<span class="fu">st_transform</span>(<span class="fu">st_sample</span>(area, <span class="dv">2000</span>), terra<span class="sc">::</span><span class="fu">crs</span>(covariates)))</span>
+<span id="cb42-140"><a href="#cb42-140" aria-hidden="true" tabindex="-1"></a>    na_area <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">is.na</span>(terra<span class="sc">::</span><span class="fu">extract</span>(covariates, samp, <span class="at">ID =</span> <span class="cn">FALSE</span>)))</span>
+<span id="cb42-141"><a href="#cb42-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"covariates: cover study area"</span>, <span class="fu">all</span>(na_area <span class="sc">&lt;=</span> <span class="fl">0.05</span>),</span>
+<span id="cb42-142"><a href="#cb42-142" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="fu">sprintf</span>(<span class="st">"%s %.1f%% missing"</span>, <span class="fu">names</span>(na_area), <span class="dv">100</span> <span class="sc">*</span> na_area), <span class="at">collapse =</span> <span class="st">"; "</span>), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-143"><a href="#cb42-143" aria-hidden="true" tabindex="-1"></a>    na_pts <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(terra<span class="sc">::</span><span class="fu">extract</span>(covariates, terra<span class="sc">::</span><span class="fu">vect</span>(<span class="fu">st_transform</span>(pts, terra<span class="sc">::</span><span class="fu">crs</span>(covariates))), <span class="at">ID =</span> <span class="cn">FALSE</span>)))</span>
+<span id="cb42-144"><a href="#cb42-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"covariates: values at sightings"</span>, <span class="fu">all</span>(na_pts <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb42-145"><a href="#cb42-145" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="fu">sprintf</span>(<span class="st">"%s %d missing"</span>, <span class="fu">names</span>(na_pts), na_pts), <span class="at">collapse =</span> <span class="st">"; "</span>), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-146"><a href="#cb42-146" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-147"><a href="#cb42-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-148"><a href="#cb42-148" aria-hidden="true" tabindex="-1"></a>  cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail)</span>
+<span id="cb42-149"><a href="#cb42-149" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-150"><a href="#cb42-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-151"><a href="#cb42-151" aria-hidden="true" tabindex="-1"></a>check_dsm_data <span class="ot">&lt;-</span> <span class="cf">function</span>(dist, segs, obs, <span class="at">pred =</span> <span class="cn">NULL</span>, <span class="at">covariates =</span> <span class="cn">NULL</span>,</span>
+<span id="cb42-152"><a href="#cb42-152" aria-hidden="true" tabindex="-1"></a>                           <span class="at">truncation =</span> <span class="cn">NULL</span>, <span class="at">stop_on_fail =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb42-153"><a href="#cb42-153" aria-hidden="true" tabindex="-1"></a>  cl <span class="ot">&lt;-</span> <span class="fu">new_checklist</span>()</span>
+<span id="cb42-154"><a href="#cb42-154" aria-hidden="true" tabindex="-1"></a>  rec <span class="ot">&lt;-</span> cl<span class="sc">$</span>record</span>
+<span id="cb42-155"><a href="#cb42-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-156"><a href="#cb42-156" aria-hidden="true" tabindex="-1"></a>  required <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb42-157"><a href="#cb42-157" aria-hidden="true" tabindex="-1"></a>    <span class="at">dist =</span> <span class="fu">c</span>(<span class="st">"object"</span>, <span class="st">"distance"</span>, <span class="st">"size"</span>),</span>
+<span id="cb42-158"><a href="#cb42-158" aria-hidden="true" tabindex="-1"></a>    <span class="at">segs =</span> <span class="fu">c</span>(<span class="st">"Sample.Label"</span>, <span class="st">"Effort"</span>, <span class="st">"x"</span>, <span class="st">"y"</span>),</span>
+<span id="cb42-159"><a href="#cb42-159" aria-hidden="true" tabindex="-1"></a>    <span class="at">obs =</span> <span class="fu">c</span>(<span class="st">"object"</span>, <span class="st">"Sample.Label"</span>, <span class="st">"size"</span>, <span class="st">"distance"</span>),</span>
+<span id="cb42-160"><a href="#cb42-160" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"area"</span>)</span>
+<span id="cb42-161"><a href="#cb42-161" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-162"><a href="#cb42-162" aria-hidden="true" tabindex="-1"></a>  tables <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">dist =</span> dist, <span class="at">segs =</span> segs, <span class="at">obs =</span> obs, <span class="at">pred =</span> pred)</span>
+<span id="cb42-163"><a href="#cb42-163" aria-hidden="true" tabindex="-1"></a>  tables <span class="ot">&lt;-</span> tables[<span class="sc">!</span><span class="fu">vapply</span>(tables, is.null, <span class="fu">logical</span>(<span class="dv">1</span>))]</span>
+<span id="cb42-164"><a href="#cb42-164" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (nm <span class="cf">in</span> <span class="fu">names</span>(tables)) {</span>
+<span id="cb42-165"><a href="#cb42-165" aria-hidden="true" tabindex="-1"></a>    miss <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(required[[nm]], <span class="fu">names</span>(tables[[nm]]))</span>
+<span id="cb42-166"><a href="#cb42-166" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="fu">paste0</span>(nm, <span class="st">": required columns"</span>), <span class="fu">length</span>(miss) <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb42-167"><a href="#cb42-167" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">length</span>(miss)) <span class="fu">paste</span>(<span class="st">"missing:"</span>, <span class="fu">paste</span>(miss, <span class="at">collapse =</span> <span class="st">", "</span>)) <span class="cf">else</span> <span class="st">""</span>)</span>
+<span id="cb42-168"><a href="#cb42-168" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-169"><a href="#cb42-169" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">vapply</span>(<span class="fu">names</span>(tables), <span class="cf">function</span>(nm) <span class="sc">!</span><span class="fu">all</span>(required[[nm]] <span class="sc">%in%</span> <span class="fu">names</span>(tables[[nm]])), <span class="fu">logical</span>(<span class="dv">1</span>)))) {</span>
+<span id="cb42-170"><a href="#cb42-170" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail))</span>
+<span id="cb42-171"><a href="#cb42-171" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-172"><a href="#cb42-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-173"><a href="#cb42-173" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (nm <span class="cf">in</span> <span class="fu">intersect</span>(<span class="fu">names</span>(tables), <span class="fu">c</span>(<span class="st">"dist"</span>, <span class="st">"segs"</span>, <span class="st">"obs"</span>))) {</span>
+<span id="cb42-174"><a href="#cb42-174" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="fu">paste0</span>(nm, <span class="st">": plain data.frame (not sf)"</span>), <span class="sc">!</span><span class="fu">inherits</span>(tables[[nm]], <span class="st">"sf"</span>),</span>
+<span id="cb42-175"><a href="#cb42-175" aria-hidden="true" tabindex="-1"></a>        <span class="st">"drop the geometry with sf::st_drop_geometry()"</span>, <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-176"><a href="#cb42-176" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-177"><a href="#cb42-177" aria-hidden="true" tabindex="-1"></a>  unit_cols <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(<span class="fu">names</span>(tables), <span class="cf">function</span>(nm) {</span>
+<span id="cb42-178"><a href="#cb42-178" aria-hidden="true" tabindex="-1"></a>    cols <span class="ot">&lt;-</span> <span class="fu">names</span>(tables[[nm]])[<span class="fu">vapply</span>(tables[[nm]], inherits, <span class="fu">logical</span>(<span class="dv">1</span>), <span class="st">"units"</span>)]</span>
+<span id="cb42-179"><a href="#cb42-179" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(cols)) <span class="fu">paste0</span>(nm, <span class="st">"$"</span>, cols)</span>
+<span id="cb42-180"><a href="#cb42-180" aria-hidden="true" tabindex="-1"></a>  }))</span>
+<span id="cb42-181"><a href="#cb42-181" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"no units-class columns"</span>, <span class="fu">length</span>(unit_cols) <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb42-182"><a href="#cb42-182" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(<span class="fu">c</span>(unit_cols, <span class="cf">if</span> (<span class="fu">length</span>(unit_cols)) <span class="st">"(convert with as.numeric())"</span>), <span class="at">collapse =</span> <span class="st">" "</span>))</span>
+<span id="cb42-183"><a href="#cb42-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-184"><a href="#cb42-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"dist: object IDs unique"</span>, <span class="sc">!</span><span class="fu">anyDuplicated</span>(dist<span class="sc">$</span>object), <span class="fu">sprintf</span>(<span class="st">"%d duplicated"</span>, <span class="fu">sum</span>(<span class="fu">duplicated</span>(dist<span class="sc">$</span>object))))</span>
+<span id="cb42-185"><a href="#cb42-185" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"obs: object IDs unique"</span>, <span class="sc">!</span><span class="fu">anyDuplicated</span>(obs<span class="sc">$</span>object), <span class="fu">sprintf</span>(<span class="st">"%d duplicated"</span>, <span class="fu">sum</span>(<span class="fu">duplicated</span>(obs<span class="sc">$</span>object))))</span>
+<span id="cb42-186"><a href="#cb42-186" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"segs: Sample.Label unique"</span>, <span class="sc">!</span><span class="fu">anyDuplicated</span>(segs<span class="sc">$</span>Sample.Label),</span>
+<span id="cb42-187"><a href="#cb42-187" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d duplicated"</span>, <span class="fu">sum</span>(<span class="fu">duplicated</span>(segs<span class="sc">$</span>Sample.Label))))</span>
+<span id="cb42-188"><a href="#cb42-188" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"obs -&gt; dist: every object has a detection"</span>, <span class="fu">all</span>(obs<span class="sc">$</span>object <span class="sc">%in%</span> dist<span class="sc">$</span>object),</span>
+<span id="cb42-189"><a href="#cb42-189" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d not in dist"</span>, <span class="fu">sum</span>(<span class="sc">!</span>obs<span class="sc">$</span>object <span class="sc">%in%</span> dist<span class="sc">$</span>object)))</span>
+<span id="cb42-190"><a href="#cb42-190" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"dist -&gt; obs: every detection is linked to a segment"</span>, <span class="fu">all</span>(dist<span class="sc">$</span>object <span class="sc">%in%</span> obs<span class="sc">$</span>object),</span>
+<span id="cb42-191"><a href="#cb42-191" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d not in obs (they only inform the detection function)"</span>, <span class="fu">sum</span>(<span class="sc">!</span>dist<span class="sc">$</span>object <span class="sc">%in%</span> obs<span class="sc">$</span>object)),</span>
+<span id="cb42-192"><a href="#cb42-192" aria-hidden="true" tabindex="-1"></a>      <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-193"><a href="#cb42-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"obs -&gt; segs: every Sample.Label exists"</span>, <span class="fu">all</span>(obs<span class="sc">$</span>Sample.Label <span class="sc">%in%</span> segs<span class="sc">$</span>Sample.Label),</span>
+<span id="cb42-194"><a href="#cb42-194" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d not in segs"</span>, <span class="fu">sum</span>(<span class="sc">!</span>obs<span class="sc">$</span>Sample.Label <span class="sc">%in%</span> segs<span class="sc">$</span>Sample.Label)))</span>
+<span id="cb42-195"><a href="#cb42-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-196"><a href="#cb42-196" aria-hidden="true" tabindex="-1"></a>  eff <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(segs<span class="sc">$</span>Effort)</span>
+<span id="cb42-197"><a href="#cb42-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"segs: Effort &gt; 0"</span>, <span class="sc">!</span><span class="fu">anyNA</span>(eff) <span class="sc">&amp;&amp;</span> <span class="fu">all</span>(eff <span class="sc">&gt;</span> <span class="dv">0</span>), <span class="fu">sprintf</span>(<span class="st">"%d missing or &lt;= 0"</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(eff) <span class="sc">|</span> eff <span class="sc">&lt;=</span> <span class="dv">0</span>)))</span>
+<span id="cb42-198"><a href="#cb42-198" aria-hidden="true" tabindex="-1"></a>  dd <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(dist<span class="sc">$</span>distance)</span>
+<span id="cb42-199"><a href="#cb42-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"dist: distances &gt;= 0"</span>, <span class="sc">!</span><span class="fu">anyNA</span>(dd) <span class="sc">&amp;&amp;</span> <span class="fu">all</span>(dd <span class="sc">&gt;=</span> <span class="dv">0</span>), <span class="fu">sprintf</span>(<span class="st">"%d missing or negative"</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(dd) <span class="sc">|</span> dd <span class="sc">&lt;</span> <span class="dv">0</span>)))</span>
+<span id="cb42-200"><a href="#cb42-200" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(truncation)) {</span>
+<span id="cb42-201"><a href="#cb42-201" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"dist: distances within truncation"</span>, <span class="fu">all</span>(dd <span class="sc">&lt;=</span> truncation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb42-202"><a href="#cb42-202" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"%d beyond %.0f m (will be excluded)"</span>, <span class="fu">sum</span>(dd <span class="sc">&gt;</span> truncation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), truncation), <span class="at">level =</span> <span class="st">"WARN"</span>)</span>
+<span id="cb42-203"><a href="#cb42-203" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-204"><a href="#cb42-204" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rec</span>(<span class="st">"segs: coordinates present"</span>, <span class="sc">!</span><span class="fu">anyNA</span>(segs<span class="sc">$</span>x) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">anyNA</span>(segs<span class="sc">$</span>y),</span>
+<span id="cb42-205"><a href="#cb42-205" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sprintf</span>(<span class="st">"%d missing"</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(segs<span class="sc">$</span>x) <span class="sc">|</span> <span class="fu">is.na</span>(segs<span class="sc">$</span>y))))</span>
+<span id="cb42-206"><a href="#cb42-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-207"><a href="#cb42-207" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(covariates)) {</span>
+<span id="cb42-208"><a href="#cb42-208" aria-hidden="true" tabindex="-1"></a>    miss <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(covariates, <span class="fu">names</span>(segs))</span>
+<span id="cb42-209"><a href="#cb42-209" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"segs: covariate columns"</span>, <span class="fu">length</span>(miss) <span class="sc">==</span> <span class="dv">0</span>, <span class="fu">paste</span>(miss, <span class="at">collapse =</span> <span class="st">", "</span>))</span>
+<span id="cb42-210"><a href="#cb42-210" aria-hidden="true" tabindex="-1"></a>    na <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">intersect</span>(covariates, <span class="fu">names</span>(segs)), <span class="cf">function</span>(v) <span class="fu">sum</span>(<span class="fu">is.na</span>(segs[[v]])), <span class="fu">numeric</span>(<span class="dv">1</span>))</span>
+<span id="cb42-211"><a href="#cb42-211" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"segs: covariates complete"</span>, <span class="fu">all</span>(na <span class="sc">==</span> <span class="dv">0</span>), <span class="fu">paste</span>(<span class="fu">names</span>(na)[na <span class="sc">&gt;</span> <span class="dv">0</span>], na[na <span class="sc">&gt;</span> <span class="dv">0</span>], <span class="at">sep =</span> <span class="st">" = "</span>, <span class="at">collapse =</span> <span class="st">", "</span>))</span>
+<span id="cb42-212"><a href="#cb42-212" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-213"><a href="#cb42-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-214"><a href="#cb42-214" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(pred)) {</span>
+<span id="cb42-215"><a href="#cb42-215" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">inherits</span>(pred, <span class="st">"sf"</span>)) <span class="fu">st_drop_geometry</span>(pred) <span class="cf">else</span> pred</span>
+<span id="cb42-216"><a href="#cb42-216" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"pred: coordinates and area complete"</span>, stats<span class="sc">::</span><span class="fu">complete.cases</span>(p[, <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"area"</span>)]) <span class="sc">|&gt;</span> <span class="fu">all</span>())</span>
+<span id="cb42-217"><a href="#cb42-217" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(covariates)) {</span>
+<span id="cb42-218"><a href="#cb42-218" aria-hidden="true" tabindex="-1"></a>      miss <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(covariates, <span class="fu">names</span>(p))</span>
+<span id="cb42-219"><a href="#cb42-219" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rec</span>(<span class="st">"pred: covariate columns"</span>, <span class="fu">length</span>(miss) <span class="sc">==</span> <span class="dv">0</span>, <span class="fu">paste</span>(miss, <span class="at">collapse =</span> <span class="st">", "</span>))</span>
+<span id="cb42-220"><a href="#cb42-220" aria-hidden="true" tabindex="-1"></a>      na <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">intersect</span>(covariates, <span class="fu">names</span>(p)), <span class="cf">function</span>(v) <span class="fu">sum</span>(<span class="fu">is.na</span>(p[[v]])), <span class="fu">numeric</span>(<span class="dv">1</span>))</span>
+<span id="cb42-221"><a href="#cb42-221" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rec</span>(<span class="st">"pred: covariates complete"</span>, <span class="fu">all</span>(na <span class="sc">==</span> <span class="dv">0</span>), <span class="fu">paste</span>(<span class="fu">names</span>(na)[na <span class="sc">&gt;</span> <span class="dv">0</span>], na[na <span class="sc">&gt;</span> <span class="dv">0</span>], <span class="at">sep =</span> <span class="st">" = "</span>, <span class="at">collapse =</span> <span class="st">", "</span>))</span>
+<span id="cb42-222"><a href="#cb42-222" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb42-223"><a href="#cb42-223" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Segments and grid must share a coordinate system: their extents must overlap.</span></span>
+<span id="cb42-224"><a href="#cb42-224" aria-hidden="true" tabindex="-1"></a>    overlap <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b) <span class="fu">max</span>(<span class="fu">min</span>(a), <span class="fu">min</span>(b)) <span class="sc">&lt;</span> <span class="fu">min</span>(<span class="fu">max</span>(a), <span class="fu">max</span>(b))</span>
+<span id="cb42-225"><a href="#cb42-225" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rec</span>(<span class="st">"segs and pred in the same coordinate system"</span>, <span class="fu">overlap</span>(segs<span class="sc">$</span>x, p<span class="sc">$</span>x) <span class="sc">&amp;&amp;</span> <span class="fu">overlap</span>(segs<span class="sc">$</span>y, p<span class="sc">$</span>y),</span>
+<span id="cb42-226"><a href="#cb42-226" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sprintf</span>(<span class="st">"segs x %.0f to %.0f, pred x %.0f to %.0f"</span>, <span class="fu">min</span>(segs<span class="sc">$</span>x), <span class="fu">max</span>(segs<span class="sc">$</span>x), <span class="fu">min</span>(p<span class="sc">$</span>x), <span class="fu">max</span>(p<span class="sc">$</span>x)))</span>
+<span id="cb42-227"><a href="#cb42-227" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-228"><a href="#cb42-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-229"><a href="#cb42-229" aria-hidden="true" tabindex="-1"></a>  cl<span class="sc">$</span><span class="fu">result</span>(stop_on_fail)</span>
+<span id="cb42-230"><a href="#cb42-230" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/hambrecht\.github\.io\/mri\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../workflow/index.html" class="pagination-link" aria-label="R Workflow">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">R Workflow</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../workflow/covariates.html" class="pagination-link" aria-label="Covariates and prediction grid">
+        <span class="nav-page-text">Covariates and prediction grid</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Moose Research Initiative — Theme 4</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/hambrecht/mri">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

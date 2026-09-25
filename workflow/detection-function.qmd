@@ -1,0 +1,183 @@
+---
+title: "Estimating the detection function"
+author: "Leonard Hambrecht, IRSS, University of British Columbia"
+date: "September 2026"
+bibliography: references.bib
+---
+
+## Introduction
+
+Not every animal within the searched strip is seen. The detection function describes how the probability of detecting an animal decreases with distance from the flight line, and it is what lets us correct counts for the animals that were missed [@buckland2001]. In this article we fit candidate detection functions to the RMNP sightings, with and without covariates, and select one to carry forward into the [density surface model](dsm.qmd).
+
+The approach follows the detection function part of the `dsm` example [*A simple DSM analysis: Gulf of Mexico dolphins*](https://distancesampling.org/dsm/articles/lines_gomex/mexico-analysis.html). The main difference is that we pool several species and let species enter the detection function as a covariate, since elk, deer and bison were seen too rarely to support separate models.
+
+## Prerequisites
+
+```{r}
+#| label: packages
+#| message: false
+library(here)
+library(Distance)
+library(ggplot2)
+```
+
+We load the tables built in [*Adding covariates and building a prediction grid*](covariates.qmd).
+
+```{r}
+#| label: load
+model_data <- readRDS(here("workflow", "outputs", "model_data.rds"))
+list2env(model_data, envir = environment())
+
+dist$Species <- relevel(factor(dist$Species), ref = "Moose")
+```
+
+Setting moose as the reference level means the Species coefficients in the detection function are differences from moose, our main species of interest.
+
+## Exploratory data analysis
+
+The distribution of distances is the first thing to look at. A detection function assumes that detection is certain on the line and falls off smoothly with distance.
+
+```{r}
+#| label: fig-hist-species
+#| fig-cap: "Perpendicular distances by species, within the truncation distance."
+ggplot(dist, aes(distance)) +
+  geom_histogram(binwidth = 25, boundary = 0) +
+  facet_wrap(~Species, scales = "free_y") +
+  labs(x = "Distance (m)", y = "Count") +
+  theme_minimal()
+```
+
+Detectability may also depend on how much vegetation surrounds the animals. Here we plot distance against canopy cover at the sighting.
+
+```{r}
+#| label: fig-cover
+#| fig-cap: "Distance against canopy cover (percentage of lidar returns above 2 m) at the sighting."
+ggplot(dist, aes(pabove2, distance)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", formula = y ~ x) +
+  labs(x = "Canopy cover, pabove2 (%)", y = "Distance (m)") +
+  theme_minimal()
+```
+
+## Fitting a detection function
+
+We start with the two standard key functions without covariates: the half-normal and the hazard-rate. We also try a half-normal with cosine adjustment terms, which can add flexibility to the shape. All models use the truncation distance chosen in [*Formatting aerial survey data*](data-formatting.qmd).
+
+```{r}
+#| label: null-models
+#| message: false
+df_hn <- ds(dist, truncation = TRUNCATION_M, key = "hn", adjustment = NULL)
+df_hr <- ds(dist, truncation = TRUNCATION_M, key = "hr", adjustment = NULL)
+df_hn_cos <- ds(dist, truncation = TRUNCATION_M, key = "hn", adjustment = "cos",
+                max_adjustments = 2)
+```
+
+```{r}
+#| label: summary-hr
+summary(df_hr)
+```
+
+```{r}
+#| label: fig-null-models
+#| fig-cap: "Half-normal (left) and hazard-rate (right) detection functions."
+#| fig-width: 8
+#| fig-height: 4
+par(mfrow = c(1, 2))
+plot(df_hn, main = "Half-normal")
+plot(df_hr, main = "Hazard-rate")
+```
+
+## Adding covariates to the detection function
+
+Covariates change the scale of the detection function, so that animals are, for example, harder to see in dense cover [@marques2007]. We try the candidates one and two at a time, with both key functions:
+
+- `Species`: animals differ in size and colour, and in how they react to aircraft;
+- `size`: larger groups are easier to see;
+- `pabove2`: canopy cover at the sighting;
+- `zmax`: canopy height at the sighting.
+
+```{r}
+#| label: covariate-models
+#| message: false
+#| warning: false
+covariates <- c("Species", "size", "pabove2", "zmax")
+formulas <- c(
+  covariates,
+  combn(covariates, 2, paste, collapse = " + ")
+)
+
+df_cov <- list()
+for (f in formulas) {
+  for (key in c("hn", "hr")) {
+    fit <- tryCatch(
+      ds(dist, truncation = TRUNCATION_M, key = key, adjustment = NULL,
+         formula = as.formula(paste("~", f))),
+      error = function(e) NULL
+    )
+    if (!is.null(fit)) df_cov[[paste(key, f)]] <- fit
+  }
+}
+length(df_cov)
+```
+
+`tryCatch()` skips any model that fails to converge rather than stopping the loop. Each fit takes 10–20 seconds, so the whole set takes several minutes.
+
+## Model selection
+
+`summarize_ds_models()` builds a table of all models ranked by AIC, along with a Cramér–von Mises goodness-of-fit $p$-value and the average detection probability $\hat{P}_a$.
+
+```{r}
+#| label: model-table
+all_models <- c(list(df_hn, df_hr, df_hn_cos), unname(df_cov))
+model_table <- do.call(summarize_ds_models, c(all_models, list(output = "plain")))
+head(model_table[, -1], 10)
+```
+
+Models within about two AIC units of the lowest are practically as well supported. Here the top models, with and without canopy cover, all fall within that range, and their average detection probabilities differ by less than their standard errors. AIC alone cannot choose between them.
+
+```{r}
+#| label: top-models
+model_table[model_table[["Delta AIC"]] < 2, c("Key function", "Formula", "Delta AIC")]
+```
+
+When models are tied, the choice should rest on what we know about the survey. Canopy cover is an established cause of missed animals in aerial surveys, and a detection function with canopy can describe detectability in parts of the park the survey sampled differently. We therefore carry forward the hazard-rate model with species and canopy cover (`pabove2`). This is also the model selected in the RMNP analysis.
+
+```{r}
+#| label: best
+df_best <- df_cov[["hr Species + pabove2"]]
+summary(df_best)
+```
+
+Detection falls off faster for deer than for moose, and faster in denser canopy (the `pabove2` coefficient is negative). The coefficients for bison and wolves have very large standard errors: with five sightings each, their detection scale cannot be estimated. This does not affect the moose, deer and elk estimates. It does mean that these two species' densities rest on very little information about detectability.
+
+## Goodness of fit
+
+A quantile–quantile plot compares the fitted cumulative distribution with the empirical one. Points close to the line and a non-significant Cramér–von Mises test indicate that the model describes the distances well.
+
+```{r}
+#| label: fig-gof
+#| fig-cap: "Q–Q plot for the selected detection function."
+gof_ds(df_best)
+```
+
+With covariates in the model, each sighting has its own detection function. The plot shows the average detection function over the histogram of distances, with the individual detection probabilities as points.
+
+```{r}
+#| label: fig-best
+#| fig-cap: "Selected detection function."
+plot(df_best, showpoints = TRUE, pch = 20, cex = 0.5)
+```
+
+## Saving
+
+```{r}
+#| label: save
+saveRDS(df_best, here("workflow", "outputs", "detection_function.rds"))
+```
+
+**Next:** [Fitting a density surface model](dsm.qmd).
+
+## References
+
+::: {#refs}
+:::
