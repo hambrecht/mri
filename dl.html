@@ -281,8 +281,8 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
-  <li><a href="#study-area" id="toc-study-area" class="nav-link" data-scroll-target="#study-area">Study Area</a></li>
-  <li><a href="#what-we-tested" id="toc-what-we-tested" class="nav-link" data-scroll-target="#what-we-tested">What We Tested</a></li>
+  <li><a href="#study-area-and-data-collection" id="toc-study-area-and-data-collection" class="nav-link" data-scroll-target="#study-area-and-data-collection">Study Area and Data Collection</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   <li><a href="#key-findings" id="toc-key-findings" class="nav-link" data-scroll-target="#key-findings">Key Findings</a></li>
   <li><a href="#recommendations" id="toc-recommendations" class="nav-link" data-scroll-target="#recommendations">Recommendations</a></li>
@@ -317,115 +317,113 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>Drones equipped with thermal cameras are increasingly used to survey wildlife. They are cheaper and safer than crewed aircraft, they can detect animals hidden beneath canopy, and they can fly in low light. But they create a new problem: hours of footage that somebody has to watch. Manual review is slow, tiring, and easy to get wrong.</p>
-<p>Deep learning offers a way to automate that review. Most wildlife applications to date have used one family of models — convolutional neural networks (CNNs), typically the YOLO family — trained on visible-light imagery. Two developments have changed what is possible. First, a newer family of models, <strong>transformers</strong>, interprets an entire image at once rather than scanning it in small local patches. Second, <strong>foundation models</strong> — very large models pretrained on billions of images — can now be adapted, or “fine-tuned,” to a specialist task with a relatively modest amount of labelled data. Together these mean that practitioners no longer need to build a detector from scratch.</p>
-<p>This study is the first to test automated moose detection in thermal drone imagery, and the first to attempt telling moose apart from deer — two species that look very similar in a grainy heat signature. We compared a conventional CNN detector against a transformer detector built on a foundation model, and asked a practical question: what actually works, and is it good enough to use?</p>
+<p>Unmanned aerial vehicles (UAVs) equipped with thermal infrared sensors are increasingly applied to wildlife surveys. Thermal sensors detect radiated heat rather than reflected light, enabling imaging under low light conditions and improving the detectability of animals partially obscured by vegetation. For surveys of large mammals over remote landscapes, UAVs also reduce risk to personnel, limit disturbance to wildlife, and allow more flexible flight operations than crewed aircraft.</p>
+<p>The main bottleneck is the volume of imagery produced. Manual review of survey footage is time consuming, labour intensive, and susceptible to observer error, which limits the scale at which UAV surveys can be deployed operationally.</p>
+<p>Deep learning provides a means of automating this review. Most applications in wildlife monitoring to date have used convolutional neural networks (CNNs), predominantly the YOLO family of detectors, and have focused on visible light imagery. Two developments have changed what is now feasible. Transformer architectures interpret an entire image simultaneously rather than aggregating local features, which may be advantageous where targets lack fine detail. Separately, vision foundation models pretrained on very large image collections can be adapted to specialised tasks with comparatively modest quantities of labelled data, reducing the need to train detectors from scratch.</p>
+<p>This study provides the first assessment of automated moose detection in thermal UAV imagery, and the first attempt to distinguish moose from deer, two species that are difficult to separate in low resolution thermal signatures. A conventional CNN detector was compared against a transformer detector incorporating a pretrained foundation model, under an evaluation protocol designed to reflect operational deployment.</p>
 </section>
-<section id="study-area" class="level2">
-<h2 class="anchored" data-anchor-id="study-area">Study Area</h2>
-<p>Footage was collected in southern Manitoba, Canada, during February and March 2024, as part of the province’s Chronic Wasting Disease monitoring program. The landscape is predominantly agricultural, and surveys were flown under snow-covered conditions with daily mean temperatures from −18 °C to +1 °C.</p>
-<p>A fixed-wing drone was flown along pre-programmed lines at 120 m altitude. When the pilot spotted a heat signature, they switched to manual control and used the camera’s zoom and angle to get a closer look. The drone recorded thermal and visible-light video simultaneously, so species identity could be confirmed from the colour footage.</p>
-<p>From six survey dates we assembled <strong>4,787 images containing 9,243 labelled animals</strong> — 2,377 moose and 6,866 deer. Because the camera zoomed in and out constantly, animals appear at wildly different sizes, from a few pixels to a large close-up. This makes the dataset realistic, and hard.</p>
-<div class="quarto-layout-panel" data-layout-ncol="3">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<section id="study-area-and-data-collection" class="level2">
+<h2 class="anchored" data-anchor-id="study-area-and-data-collection">Study Area and Data Collection</h2>
+<p>Footage was acquired in southern Manitoba, Canada, during February and March 2024, as part of the provincial Chronic Wasting Disease monitoring program. The study area lies within the Prairie Ecozone and is dominated by agricultural land. Surveys were flown under predominantly snow covered conditions, with daily mean temperatures ranging from -18.3 to 1.2 °C.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figures/DJI_20250122123651_0030_W.jpg" class="img-fluid figure-img"></p>
-<figcaption>Visible light (RGB) image of a conifer forest</figcaption>
+<p><img src="figures/dl_study_area.png" class="img-fluid figure-img"></p>
+<figcaption>Study area in southern Manitoba, Canada.</figcaption>
 </figure>
 </div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<p>A fixed wing UAV was flown along pre-programmed transects at 120 m altitude. Upon detection of a thermal hotspot, the pilot transitioned to manual loitering and adjusted camera angle and zoom to obtain oblique views of the target. Thermal and visible imagery were recorded simultaneously, allowing species identity to be confirmed by wildlife specialists from the visible footage.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figures/DJI_20250122123651_0030_T.JPG" class="img-fluid figure-img"></p>
-<figcaption>Thermal image showing two animals</figcaption>
+<p><img src="figures/dl_uav.jpg" class="img-fluid figure-img"></p>
+<figcaption>Fixed wing UAV platform used for data collection.</figcaption>
 </figure>
 </div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<p>Six survey dates yielded 4,787 images containing 9,243 annotated animals, comprising 2,377 moose and 6,866 deer. Because camera zoom and viewing geometry varied continuously during acquisition, apparent animal size ranged from a few pixels to large close range signatures, producing substantial scale variation within the dataset.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figures/thermalHorses.png" class="img-fluid figure-img"></p>
-<figcaption>IR image zoomed in on the thermal signatures</figcaption>
+<p><img src="figures/dl_rgb_thermal.png" class="img-fluid figure-img"></p>
+<figcaption>Corresponding visible and thermal imagery of a moose beneath tree canopy.</figcaption>
 </figure>
-</div>
-</div>
-</div>
 </div>
 </section>
-<section id="what-we-tested" class="level2">
-<h2 class="anchored" data-anchor-id="what-we-tested">What We Tested</h2>
-<p><strong>Two detector families.</strong> YOLOv11, the current version of the CNN detector most widely used in wildlife work, and LT-DETR, a transformer detector built on DINOv3 — a foundation model pretrained on 1.7 billion images.</p>
-<p><strong>A realistic test.</strong> Rather than shuffling all images randomly into training and testing piles, we split the data <strong>by survey date</strong>. The model was trained on some survey days and tested on completely different days it had never seen. This mimics what actually happens in practice: you train on last year’s footage and deploy on this year’s. Random splits make models look better than they are, because the test images are near-duplicates of the training images.</p>
-<p><strong>Three follow-up questions.</strong> Does the size of the animal in the image matter? Does foundation-model pretraining actually help on thermal imagery, which looks nothing like the photographs these models were pretrained on? And does choosing a bigger model give better results?</p>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/dl_methods_flow.png" class="img-fluid figure-img"></p>
+<figcaption>Overview of the processing and evaluation workflow.</figcaption>
+</figure>
+</div>
+<p>Two detector families were evaluated. YOLOv11 represents the current generation of the CNN detectors most widely applied in wildlife monitoring. LT-DETR is a transformer detector built on DINOv3, a vision foundation model pretrained on 1.7 billion images of natural scenes.</p>
+<p>Model performance was assessed using a cross survey evaluation protocol. Rather than partitioning images at random, the data were divided by survey date, such that models were trained on a subset of survey dates and evaluated on dates not seen during training. This approach reflects operational conditions, in which a model trained on existing footage is applied to new surveys. Random partitioning of frames drawn from the same flights produces optimistic performance estimates, because test images closely resemble those used for training. The figure below shows example images from each of the 5 folds used in this study.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/dl_folds.png" class="img-fluid figure-img"></p>
+<figcaption>Sample images for each survey fold. Moose (top) and deer (bottom) individuals are depicted. For Fold 5, both species were found coexisting in the same environment.</figcaption>
+</figure>
+</div>
+<p>Three further questions were examined: whether detection accuracy varies with the apparent size of the animal in the image; whether foundation model pretraining confers benefit despite the substantial difference between natural scene imagery and thermal aerial imagery; and whether increasing model size improves performance on a dataset of this scale.</p>
 </section>
 <section id="results" class="level2">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/dl_model_comparison.png" class="img-fluid figure-img"></p>
-<figcaption><em>Detection performance for both models, shown separately for moose, deer, and both combined. Higher is better.</em></figcaption>
+<figcaption>Detection performance of both models for moose, deer, and the mean across classes.</figcaption>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/dl_example_predictions.png" class="img-fluid figure-img"></p>
-<figcaption><em>Example detections. Orange boxes are moose, green boxes are deer. The transformer model (right) finds animals the CNN model (centre) misses or misidentifies.</em></figcaption>
+<figcaption>Example detections. Orange boxes indicate moose and green boxes indicate deer.</figcaption>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/dl_object_size.png" class="img-fluid figure-img"></p>
-<figcaption><em>Performance by animal size in the image. Moose get easier to detect as they get larger; deer do not.</em></figcaption>
+<figcaption>Detection accuracy by apparent object size, following COCO size categories.</figcaption>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/dl_counts.png" class="img-fluid figure-img"></p>
-<figcaption><em>Predicted counts against true counts for each survey. The dotted line is perfect agreement. Points below the line indicate undercounting.</em></figcaption>
+<figcaption>Predicted counts against observed counts for each survey fold. The dotted line indicates perfect agreement.</figcaption>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/dl_pretraining.png" class="img-fluid figure-img"></p>
-<figcaption><em>Effect of pretraining. A = no pretraining, B = pretrained backbone only, C = fully pretrained model.</em></figcaption>
+<figcaption>Detection accuracy under three pretraining configurations: no pretraining (A), pretrained backbone only (B), and fully pretrained model (C).</figcaption>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/dl_model_size.png" class="img-fluid figure-img"></p>
-<figcaption><em>Performance across four YOLOv11 model sizes. Bigger is not always better.</em></figcaption>
+<figcaption>Detection accuracy across four YOLOv11 model sizes.</figcaption>
 </figure>
 </div>
 </section>
 <section id="key-findings" class="level2">
 <h2 class="anchored" data-anchor-id="key-findings">Key Findings</h2>
-<p><strong>The transformer model outperformed the CNN across the board.</strong> LT-DETR was roughly 29% more precise and 17% better at finding animals than YOLOv11, with similar margins on every other measure. In practical terms: about three-quarters of what LT-DETR flagged was a real animal, compared with just over half for YOLOv11. Thermal imagery at 120 m gives you a vague warm blob with little shape or texture — exactly the situation where a model that reads the whole scene has an advantage over one that looks for local detail.</p>
-<p><strong>Pretraining on unrelated images helps a great deal.</strong> A model trained from scratch on our data alone reached considerably lower accuracy than the same model built on a pretrained foundation. This held even though the pretraining images were ordinary colour photographs of everyday objects — nothing like a moose seen from above through a thermal sensor. Pretraining also made the model converge far faster, cutting training time substantially. Notably, the benefit only appeared when the whole model was pretrained, not just part of it.</p>
-<p><strong>Bigger models are not automatically better.</strong> Performance improved from the small to the large version of YOLOv11, then <em>dropped</em> for the largest version, which performed no better than the smallest. Large models need large datasets to justify their capacity; with a specialist dataset of a few thousand images, the biggest model simply overfits. Rankings published on generic benchmarks do not necessarily carry over to your data.</p>
-<p><strong>Moose are easier than deer.</strong> The models found about 70% of moose but only 54% of deer. Deer are smaller, travel in groups where individuals overlap, and are easily confused with logs, rocks, and fence posts, which produce similar heat signatures. Moose are larger and usually alone, so they stand out — though when the models did err on moose, they tended to call them deer rather than miss them entirely.</p>
-<p><strong>Size affects the two species in opposite directions.</strong> Moose became easier to detect as they filled more of the frame, as you would expect. Deer became <em>harder</em>. The likely reason is that a large deer is roughly the size of a typical moose, so the model confuses the two.</p>
-<p><strong>Both models undercount, deer especially.</strong> Even counting every detection the model made, correct or not, deer totals fell well below the true number. Any population estimate derived from raw model output would be biased low, and biased differently for the two species.</p>
-<p><strong>Performance varies between surveys.</strong> Accuracy differed noticeably from one survey date to another, depending on canopy, background clutter, and conditions. A model that works well on one flight will not necessarily perform identically on the next.</p>
+<p>The transformer detector outperformed the CNN detector across all evaluated metrics. LT-DETR achieved approximately 29% higher precision and 17% higher recall than YOLOv11, with comparable margins on other measures. In operational terms, approximately three quarters of the detections produced by LT-DETR corresponded to real animals, compared with slightly over half for YOLOv11. This advantage is consistent with the characteristics of the imagery: at 120 m altitude, thermal signatures provide limited shape and texture information, conditions under which global contextual reasoning offers an advantage over the local feature extraction on which CNN detectors rely.</p>
+<p>Pretraining conferred substantial benefit despite the difference between source and target domains. A model trained from random initialisation achieved considerably lower accuracy than the equivalent model initialised from pretrained weights, even though pretraining was performed on natural scene imagery rather than thermal aerial imagery. Pretraining also accelerated convergence, reducing training time substantially. This benefit was realised only when both the feature extraction backbone and the detection head were pretrained; pretraining the backbone alone produced no reliable improvement.</p>
+<p>Model performance did not scale with model size. Accuracy improved from the small to the large YOLOv11 variant, then declined for the extra large variant, which performed comparably to the smallest model tested. Larger models require correspondingly larger training datasets to realise their additional capacity, and appear to overfit when applied to specialised datasets of limited size. Performance rankings reported on generic benchmark datasets therefore do not necessarily transfer to applications of this kind.</p>
+<p>Detection performance differed markedly between species. Recall was approximately 70% for moose and 54% for deer. Deer are smaller, frequently occur in groups with overlapping thermal signatures, and were commonly confused with background objects producing similar signatures, including logs, rocks, and fence structures. Moose are larger and typically solitary, and were more often misclassified as deer than missed entirely. Apparent size affected the two species in opposite directions: moose detection improved as animals occupied more of the frame, whereas deer detection declined, most likely because large deer approach the apparent size of moose and are consequently confused with them. Both models undercounted deer substantially, even when all detections were considered regardless of correctness, indicating that population estimates derived from uncorrected model output would be biased, and biased differently between species. Accuracy also varied considerably between survey dates, reflecting differences in canopy cover, background clutter, and imaging conditions.</p>
 </section>
 <section id="recommendations" class="level2">
 <h2 class="anchored" data-anchor-id="recommendations">Recommendations</h2>
 <ol type="1">
-<li><strong>Treat these tools as review assistants, not replacements.</strong> At current accuracy, automated detection is well suited to screening footage, flagging likely animals, and skipping empty frames — reducing the volume a human needs to watch. It is not accurate enough to produce population estimates on its own.</li>
-<li><strong>Keep a human in the loop for species identification.</strong> Moose–deer confusion remains common. Where species-level counts drive decisions — harvest quotas, disease surveillance, herd demographics — those calls need human confirmation.</li>
-<li><strong>Account for missed animals.</strong> Imperfect detection is not unique to automation; human observers miss animals too. Either way, detection probability must be measured and corrected for before counts feed into population estimates.</li>
-<li><strong>Consider a transformer detector rather than defaulting to YOLO.</strong> The field has largely standardised on YOLO models. For low-resolution thermal imagery, transformer architectures with foundation-model pretraining performed substantially better in our tests.</li>
-<li><strong>Use pretrained models, and do not assume bigger is better.</strong> Always start from pretrained weights. But test a few model sizes on your own data rather than picking the largest available — mid-sized models often win on small datasets.</li>
-<li><strong>Test on separate survey days, not random image splits.</strong> Randomly splitting frames from the same flights will make any model look far better than it will perform in the field.</li>
+<li><p>Automated detection should be deployed as an aid to human review rather than as a replacement for it. At current accuracy, these models are suited to screening footage, generating candidate detections, and reducing the volume of imagery requiring manual inspection. They are not sufficiently accurate to produce population estimates independently, and species level determinations in particular require human confirmation where counts inform harvest regulation, disease surveillance, or herd demographic assessment.</p></li>
+<li><p>Imperfect detection must be quantified and accounted for. Missed animals are not unique to automated methods, as human observers are also subject to imperfect detection. In either case, detection probability should be estimated and incorporated into the detection function before counts are used to derive population estimates.</p></li>
+<li><p>Model selection should be validated on the target dataset. Transformer architectures with foundation model pretraining outperformed the CNN detectors that currently predominate in wildlife monitoring, and pretrained initialisation should be considered standard practice. However, model size should be evaluated empirically rather than selected on the basis of published benchmark performance, as intermediate sized models may outperform larger ones on datasets of limited scale.</p></li>
+<li><p>Evaluation should be conducted across independent surveys. Partitioning frames at random from the same flights yields performance estimates that substantially exceed those achieved when models are applied to new survey conditions.</p></li>
 </ol>
 </section>
 <section id="looking-ahead" class="level2">
 <h2 class="anchored" data-anchor-id="looking-ahead">Looking Ahead</h2>
-<p>The main constraint is data. With only 14 individual moose in our dataset, the models had limited variety to learn from; more animals, more seasons, and more landscapes would be the single biggest improvement.</p>
-<p>Two other directions matter for operational use. First, our footage was collected after a pilot had already spotted an animal and centred the camera on it, so the accuracy reported here reflects performance on pre-selected clips rather than raw continuous survey footage. Evaluating performance on complete, unfiltered flights is the necessary next step before these tools can support population monitoring directly. Second, these models work on single still frames; linking detections across video frames would allow individual animals to be tracked and counted rather than simply flagged, which is what converts detections into the numbers managers actually need.</p>
-<p>The dataset, trained models, and code from this study are publicly available so that others can build on them.</p>
+<p>The principal constraint on further improvement is the quantity and diversity of training data. The present dataset contained only 14 individual moose, and expanding coverage across additional individuals, seasons, and landscapes represents the most substantial opportunity for improvement.</p>
+<p>Two further considerations bear on operational deployment. Footage analysed here was collected following pilot detection and manual framing of targets, and frames containing severely degraded or indistinguishable animals were excluded during quality control. Reported accuracy therefore reflects performance on human selected clips rather than continuous survey footage, and evaluation on complete unfiltered flights is required before these methods can directly support population monitoring. In addition, the models operate on individual still frames. Linking detections across consecutive video frames would enable individual animals to be tracked rather than simply detected, which is necessary to convert frame level detections into the abundance estimates required for management.</p>
+<p>The dataset and trained models from this study are publicly available.</p>
 <hr>
 <p><em>Goto, H., Coops, N. C., Stenhouse, G., Yi, K. M., Hambrecht, L., &amp; Solmundson, K. Automated detection of moose and deer in thermal imagery using unmanned aerial vehicles and deep learning.</em> Ecological Informatics<em>. Dataset: <a href="https://doi.org/10.5281/zenodo.20018687">10.5281/zenodo.20018687</a></em></p>
 
